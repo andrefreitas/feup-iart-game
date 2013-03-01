@@ -1,5 +1,11 @@
+import javax.swing.JLabel;
+
 
 public class Piece {
+	
+	public JLabel image;
+	public JLabel white;
+	public JLabel black;
 	
 	public boolean active;
 	public char color; //'p'-preta, 'b'-branca;
