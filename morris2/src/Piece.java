@@ -11,5 +11,5 @@ public class Piece {
 	public int deltx;
 	public int delty;
 	
-	public int tamanho;
+	public int mySize;
 }

@@ -13,5 +13,5 @@ public class Slot {
 	
 	public boolean occupied;
 	
-	public Piece peca=null;
+	public Piece piece=null;
 }

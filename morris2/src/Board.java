@@ -6,12 +6,12 @@ import java.awt.event.MouseEvent;
 
 public class Board {
 
-	public Slot[][] tabuleiro;//tabuleiro[x][y].... x-> \\  y (para baixo)
-	public Player jogador1;
-	public Player jogador2;
+	public Slot[][] board;//board[x][y].... x-> \\  y (para baixo)
+	public Player player1;
+	public Player player2;
 	
-	public int peca_select=-1;
-	public Piece[] pecas;
+	public int piece_select=-1;
+	public Piece[] pieces;
 	
 	public Board()
 	{
@@ -22,14 +22,14 @@ public class Board {
 	
 	private void init_pieces() {
 		
-		pecas=new Piece[18];
+		pieces=new Piece[18];
 		for(int i=0;i<18;i++)
 		{
-			pecas[i]=new Piece();
-			pecas[i].active=true;
-			pecas[i].color='b';
+			pieces[i]=new Piece();
+			pieces[i].active=true;
+			pieces[i].color='b';
 			if(i<9)
-				pecas[i].color='p';
+				pieces[i].color='p';
 		}
 		
 	}
@@ -45,7 +45,7 @@ public class Board {
 						
 					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED )
 					{
-						peca_select=-1;
+						piece_select=-1;
 					}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED )
 					{
 						int mouseX=evt.getX()-10;
@@ -55,15 +55,15 @@ public class Board {
 						
 						//System.out.println("mouseX: "+mouseX+", mouseY: "+mouseY);
 						
-						if(peca_select == -1){
-							for(int i=0;i<pecas.length;i++)
+						if(piece_select == -1){
+							for(int i=0;i<pieces.length;i++)
 							{
-								if(pecas[i].coordx <= mouseX && (pecas[i].coordx+pecas[i].tamanho) >= mouseX &&
-								   pecas[i].coordy <= mouseY && (pecas[i].coordy+pecas[i].tamanho) >= mouseY)
+								if(pieces[i].coordx <= mouseX && (pieces[i].coordx+pieces[i].mySize) >= mouseX &&
+									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY)
 								{
-									peca_select=i;
-									pecas[i].deltx=mouseX-pecas[i].coordx;
-									pecas[i].delty=mouseY-pecas[i].coordy;
+									piece_select=i;
+									pieces[i].deltx=mouseX-pieces[i].coordx;
+									pieces[i].delty=mouseY-pieces[i].coordy;
 									//System.out.println("peca: "+i);
 									break;
 								}
@@ -71,22 +71,22 @@ public class Board {
 							}
 						}else{
 							
-							int[] pos_oux=peca_tab(mouseX,mouseY,pecas[peca_select].tamanho);
+							int[] pos_oux=peca_tab(mouseX,mouseY,pieces[piece_select].mySize);
 							if(pos_oux[0]==-1)
 							{
-								pecas[peca_select].coordx=mouseX-pecas[peca_select].deltx;
-								pecas[peca_select].coordy=mouseY-pecas[peca_select].delty;
+								pieces[piece_select].coordx=mouseX-pieces[piece_select].deltx;
+								pieces[piece_select].coordy=mouseY-pieces[piece_select].delty;
 							}else{
-								pecas[peca_select].coordx=tab_pos[pos_oux[0]][pos_oux[1]][0];
-								pecas[peca_select].coordy=tab_pos[pos_oux[0]][pos_oux[1]][1];
+								pieces[piece_select].coordx=tab_pos[pos_oux[0]][pos_oux[1]][0];
+								pieces[piece_select].coordy=tab_pos[pos_oux[0]][pos_oux[1]][1];
 							}
 													
-							pecas[peca_select].imagem.setBounds(pecas[peca_select].coordx, 
-																pecas[peca_select].coordy, 
-									pecas[peca_select].tamanho, pecas[peca_select].tamanho);
+							pieces[piece_select].imagem.setBounds(pieces[piece_select].coordx, 
+									pieces[piece_select].coordy, pieces[piece_select].mySize, 
+									pieces[piece_select].mySize);
 							
-							System.out.println("pecaX: "+pecas[peca_select].coordx+
-											", pecaY: "+pecas[peca_select].coordy);
+							System.out.println("pecaX: "+pieces[piece_select].coordx+
+											", pecaY: "+pieces[piece_select].coordy);
 							
 						}
 						
@@ -102,330 +102,330 @@ public class Board {
 	public void init_slots()
 	{
 		
-		tabuleiro= new Slot[7][7];
-		tabuleiro[0][0]=new Slot();
-		tabuleiro[0][0].occupied=false;
-		tabuleiro[0][0].x=0;
-		tabuleiro[0][0].y=0;
+		board= new Slot[7][7];
+		board[0][0]=new Slot();
+		board[0][0].occupied=false;
+		board[0][0].x=0;
+		board[0][0].y=0;
 		
-		tabuleiro[0][3]=new Slot();
-		tabuleiro[0][3].occupied=false;
-		tabuleiro[0][3].x=0;
-		tabuleiro[0][3].y=3;
+		board[0][3]=new Slot();
+		board[0][3].occupied=false;
+		board[0][3].x=0;
+		board[0][3].y=3;
 		
-		tabuleiro[0][6]=new Slot();
-		tabuleiro[0][6].occupied=false;
-		tabuleiro[0][6].x=0;
-		tabuleiro[0][6].y=6;
+		board[0][6]=new Slot();
+		board[0][6].occupied=false;
+		board[0][6].x=0;
+		board[0][6].y=6;
 		
-		tabuleiro[1][1]=new Slot();
-		tabuleiro[1][1].occupied=false;
-		tabuleiro[1][1].x=1;
-		tabuleiro[1][1].y=1;
+		board[1][1]=new Slot();
+		board[1][1].occupied=false;
+		board[1][1].x=1;
+		board[1][1].y=1;
 		
-		tabuleiro[1][3]=new Slot();
-		tabuleiro[1][3].occupied=false;
-		tabuleiro[1][3].x=1;
-		tabuleiro[1][3].y=3;
+		board[1][3]=new Slot();
+		board[1][3].occupied=false;
+		board[1][3].x=1;
+		board[1][3].y=3;
 		
-		tabuleiro[2][2]=new Slot();
-		tabuleiro[2][2].occupied=false;
-		tabuleiro[2][2].x=2;
-		tabuleiro[2][2].y=2;
+		board[2][2]=new Slot();
+		board[2][2].occupied=false;
+		board[2][2].x=2;
+		board[2][2].y=2;
 		
-		tabuleiro[2][3]=new Slot();
-		tabuleiro[2][3].occupied=false;
-		tabuleiro[2][3].x=2;
-		tabuleiro[2][3].y=3;
+		board[2][3]=new Slot();
+		board[2][3].occupied=false;
+		board[2][3].x=2;
+		board[2][3].y=3;
 		
-		tabuleiro[2][4]=new Slot();
-		tabuleiro[2][4].occupied=false;
-		tabuleiro[2][4].x=2;
-		tabuleiro[2][4].y=4;
+		board[2][4]=new Slot();
+		board[2][4].occupied=false;
+		board[2][4].x=2;
+		board[2][4].y=4;
 		
-		tabuleiro[3][0]=new Slot();
-		tabuleiro[3][0].occupied=false;
-		tabuleiro[3][0].x=3;
-		tabuleiro[3][0].y=0;
+		board[3][0]=new Slot();
+		board[3][0].occupied=false;
+		board[3][0].x=3;
+		board[3][0].y=0;
 		
-		tabuleiro[3][1]=new Slot();
-		tabuleiro[3][1].occupied=false;
-		tabuleiro[3][1].x=3;
-		tabuleiro[3][1].y=1;
+		board[3][1]=new Slot();
+		board[3][1].occupied=false;
+		board[3][1].x=3;
+		board[3][1].y=1;
 		
-		tabuleiro[3][2]=new Slot();
-		tabuleiro[3][2].occupied=false;
-		tabuleiro[3][2].x=3;
-		tabuleiro[3][2].y=2;
+		board[3][2]=new Slot();
+		board[3][2].occupied=false;
+		board[3][2].x=3;
+		board[3][2].y=2;
 		
-		tabuleiro[3][4]=new Slot();
-		tabuleiro[3][4].occupied=false;
-		tabuleiro[3][4].x=3;
-		tabuleiro[3][4].y=4;
+		board[3][4]=new Slot();
+		board[3][4].occupied=false;
+		board[3][4].x=3;
+		board[3][4].y=4;
 		
-		tabuleiro[3][5]=new Slot();
-		tabuleiro[3][5].occupied=false;
-		tabuleiro[3][5].x=3;
-		tabuleiro[3][5].y=5;
+		board[3][5]=new Slot();
+		board[3][5].occupied=false;
+		board[3][5].x=3;
+		board[3][5].y=5;
 		
-		tabuleiro[3][6]=new Slot();
-		tabuleiro[3][6].occupied=false;
-		tabuleiro[3][6].x=3;
-		tabuleiro[3][6].y=6;
+		board[3][6]=new Slot();
+		board[3][6].occupied=false;
+		board[3][6].x=3;
+		board[3][6].y=6;
 		
-		tabuleiro[4][2]=new Slot();
-		tabuleiro[4][2].occupied=false;
-		tabuleiro[4][2].x=4;
-		tabuleiro[4][2].y=2;
+		board[4][2]=new Slot();
+		board[4][2].occupied=false;
+		board[4][2].x=4;
+		board[4][2].y=2;
 		
-		tabuleiro[4][3]=new Slot();
-		tabuleiro[4][3].occupied=false;
-		tabuleiro[4][3].x=4;
-		tabuleiro[4][3].y=3;
+		board[4][3]=new Slot();
+		board[4][3].occupied=false;
+		board[4][3].x=4;
+		board[4][3].y=3;
 		
-		tabuleiro[4][4]=new Slot();
-		tabuleiro[4][4].occupied=false;
-		tabuleiro[4][4].x=4;
-		tabuleiro[4][4].y=4;
+		board[4][4]=new Slot();
+		board[4][4].occupied=false;
+		board[4][4].x=4;
+		board[4][4].y=4;
 		
-		tabuleiro[5][1]=new Slot();
-		tabuleiro[5][1].occupied=false;
-		tabuleiro[5][1].x=5;
-		tabuleiro[5][1].y=1;
+		board[5][1]=new Slot();
+		board[5][1].occupied=false;
+		board[5][1].x=5;
+		board[5][1].y=1;
 		
-		tabuleiro[5][3]=new Slot();
-		tabuleiro[5][3].occupied=false;
-		tabuleiro[5][3].x=5;
-		tabuleiro[5][3].y=3;
+		board[5][3]=new Slot();
+		board[5][3].occupied=false;
+		board[5][3].x=5;
+		board[5][3].y=3;
 		
-		tabuleiro[5][5]=new Slot();
-		tabuleiro[5][5].occupied=false;
-		tabuleiro[5][5].x=5;
-		tabuleiro[5][5].y=5;
+		board[5][5]=new Slot();
+		board[5][5].occupied=false;
+		board[5][5].x=5;
+		board[5][5].y=5;
 		
-		tabuleiro[6][0]=new Slot();
-		tabuleiro[6][0].occupied=false;
-		tabuleiro[6][0].x=6;
-		tabuleiro[6][0].y=0;
+		board[6][0]=new Slot();
+		board[6][0].occupied=false;
+		board[6][0].x=6;
+		board[6][0].y=0;
 		
-		tabuleiro[6][3]=new Slot();
-		tabuleiro[6][3].occupied=false;
-		tabuleiro[6][3].x=6;
-		tabuleiro[6][3].y=3;
+		board[6][3]=new Slot();
+		board[6][3].occupied=false;
+		board[6][3].x=6;
+		board[6][3].y=3;
 		
-		tabuleiro[6][6]=new Slot();
-		tabuleiro[6][6].occupied=false;
-		tabuleiro[6][6].x=6;
-		tabuleiro[6][6].y=6;
+		board[6][6]=new Slot();
+		board[6][6].occupied=false;
+		board[6][6].x=6;
+		board[6][6].y=6;
 		
 		
-		tabuleiro[0][0].adjacents=new Slot[2];
-		tabuleiro[0][0].adjacents[0]=tabuleiro[0][3];
-		tabuleiro[0][0].adjacents[1]=tabuleiro[3][0];
-		tabuleiro[0][0].mill1[0]=tabuleiro[0][3];
-		tabuleiro[0][0].mill1[1]=tabuleiro[0][6];
-		tabuleiro[0][0].mill2[0]=tabuleiro[3][0];
-		tabuleiro[0][0].mill2[1]=tabuleiro[6][0];
+		board[0][0].adjacents=new Slot[2];
+		board[0][0].adjacents[0]=board[0][3];
+		board[0][0].adjacents[1]=board[3][0];
+		board[0][0].mill1[0]=board[0][3];
+		board[0][0].mill1[1]=board[0][6];
+		board[0][0].mill2[0]=board[3][0];
+		board[0][0].mill2[1]=board[6][0];
 		
-		tabuleiro[3][0].adjacents=new Slot[3];
-		tabuleiro[3][0].adjacents[0]=tabuleiro[0][0];
-		tabuleiro[3][0].adjacents[1]=tabuleiro[6][0];
-		tabuleiro[3][0].adjacents[2]=tabuleiro[3][1];
-		tabuleiro[3][0].mill1[0]=tabuleiro[0][0];
-		tabuleiro[3][0].mill1[1]=tabuleiro[6][0];
-		tabuleiro[3][0].mill2[0]=tabuleiro[3][1];
-		tabuleiro[3][0].mill2[1]=tabuleiro[3][2];
+		board[3][0].adjacents=new Slot[3];
+		board[3][0].adjacents[0]=board[0][0];
+		board[3][0].adjacents[1]=board[6][0];
+		board[3][0].adjacents[2]=board[3][1];
+		board[3][0].mill1[0]=board[0][0];
+		board[3][0].mill1[1]=board[6][0];
+		board[3][0].mill2[0]=board[3][1];
+		board[3][0].mill2[1]=board[3][2];
 		
-		tabuleiro[6][0].adjacents=new Slot[2];
-		tabuleiro[6][0].adjacents[0]=tabuleiro[3][0];
-		tabuleiro[6][0].adjacents[1]=tabuleiro[6][3];
-		tabuleiro[6][0].mill1[0]=tabuleiro[0][0];
-		tabuleiro[6][0].mill1[1]=tabuleiro[3][0];
-		tabuleiro[6][0].mill2[0]=tabuleiro[6][3];
-		tabuleiro[6][0].mill2[1]=tabuleiro[6][6];
+		board[6][0].adjacents=new Slot[2];
+		board[6][0].adjacents[0]=board[3][0];
+		board[6][0].adjacents[1]=board[6][3];
+		board[6][0].mill1[0]=board[0][0];
+		board[6][0].mill1[1]=board[3][0];
+		board[6][0].mill2[0]=board[6][3];
+		board[6][0].mill2[1]=board[6][6];
 		
-		tabuleiro[1][1].adjacents=new Slot[2];
-		tabuleiro[1][1].adjacents[0]=tabuleiro[3][1];
-		tabuleiro[1][1].adjacents[1]=tabuleiro[1][3];
-		tabuleiro[1][1].mill1[0]=tabuleiro[3][1];
-		tabuleiro[1][1].mill1[1]=tabuleiro[5][1];
-		tabuleiro[1][1].mill2[0]=tabuleiro[1][3];
-		tabuleiro[1][1].mill2[1]=tabuleiro[1][5];
+		board[1][1].adjacents=new Slot[2];
+		board[1][1].adjacents[0]=board[3][1];
+		board[1][1].adjacents[1]=board[1][3];
+		board[1][1].mill1[0]=board[3][1];
+		board[1][1].mill1[1]=board[5][1];
+		board[1][1].mill2[0]=board[1][3];
+		board[1][1].mill2[1]=board[1][5];
 		
-		tabuleiro[3][1].adjacents=new Slot[4];
-		tabuleiro[3][1].adjacents[0]=tabuleiro[1][1];
-		tabuleiro[3][1].adjacents[1]=tabuleiro[5][1];
-		tabuleiro[3][1].adjacents[2]=tabuleiro[3][2];
-		tabuleiro[3][1].adjacents[3]=tabuleiro[3][0];
-		tabuleiro[3][1].mill1[0]=tabuleiro[1][1];
-		tabuleiro[3][1].mill1[1]=tabuleiro[5][1];
-		tabuleiro[3][1].mill2[0]=tabuleiro[3][2];
-		tabuleiro[3][1].mill2[1]=tabuleiro[3][0];
+		board[3][1].adjacents=new Slot[4];
+		board[3][1].adjacents[0]=board[1][1];
+		board[3][1].adjacents[1]=board[5][1];
+		board[3][1].adjacents[2]=board[3][2];
+		board[3][1].adjacents[3]=board[3][0];
+		board[3][1].mill1[0]=board[1][1];
+		board[3][1].mill1[1]=board[5][1];
+		board[3][1].mill2[0]=board[3][2];
+		board[3][1].mill2[1]=board[3][0];
 		
-		tabuleiro[5][1].adjacents=new Slot[2];
-		tabuleiro[5][1].adjacents[0]=tabuleiro[3][1];
-		tabuleiro[5][1].adjacents[1]=tabuleiro[5][3];
-		tabuleiro[5][1].mill1[0]=tabuleiro[3][1];
-		tabuleiro[5][1].mill1[1]=tabuleiro[1][1];
-		tabuleiro[5][1].mill2[0]=tabuleiro[5][3];
-		tabuleiro[5][1].mill2[1]=tabuleiro[5][5];
+		board[5][1].adjacents=new Slot[2];
+		board[5][1].adjacents[0]=board[3][1];
+		board[5][1].adjacents[1]=board[5][3];
+		board[5][1].mill1[0]=board[3][1];
+		board[5][1].mill1[1]=board[1][1];
+		board[5][1].mill2[0]=board[5][3];
+		board[5][1].mill2[1]=board[5][5];
 		
-		tabuleiro[2][2].adjacents=new Slot[2];
-		tabuleiro[2][2].adjacents[0]=tabuleiro[3][2];
-		tabuleiro[2][2].adjacents[1]=tabuleiro[2][3];
-		tabuleiro[2][2].mill1[0]=tabuleiro[3][2];
-		tabuleiro[2][2].mill1[1]=tabuleiro[4][2];
-		tabuleiro[2][2].mill2[0]=tabuleiro[2][3];
-		tabuleiro[2][2].mill2[1]=tabuleiro[2][4];
+		board[2][2].adjacents=new Slot[2];
+		board[2][2].adjacents[0]=board[3][2];
+		board[2][2].adjacents[1]=board[2][3];
+		board[2][2].mill1[0]=board[3][2];
+		board[2][2].mill1[1]=board[4][2];
+		board[2][2].mill2[0]=board[2][3];
+		board[2][2].mill2[1]=board[2][4];
 		
-		tabuleiro[3][2].adjacents=new Slot[3];
-		tabuleiro[3][2].adjacents[0]=tabuleiro[2][2];
-		tabuleiro[3][2].adjacents[1]=tabuleiro[4][2];
-		tabuleiro[3][2].adjacents[2]=tabuleiro[3][1];
-		tabuleiro[3][2].mill1[0]=tabuleiro[2][2];
-		tabuleiro[3][2].mill1[1]=tabuleiro[4][2];
-		tabuleiro[3][2].mill2[0]=tabuleiro[3][1];
-		tabuleiro[3][2].mill2[1]=tabuleiro[3][0];
+		board[3][2].adjacents=new Slot[3];
+		board[3][2].adjacents[0]=board[2][2];
+		board[3][2].adjacents[1]=board[4][2];
+		board[3][2].adjacents[2]=board[3][1];
+		board[3][2].mill1[0]=board[2][2];
+		board[3][2].mill1[1]=board[4][2];
+		board[3][2].mill2[0]=board[3][1];
+		board[3][2].mill2[1]=board[3][0];
 		
-		tabuleiro[4][2].adjacents=new Slot[2];
-		tabuleiro[4][2].adjacents[0]=tabuleiro[3][2];
-		tabuleiro[4][2].adjacents[1]=tabuleiro[4][3];
-		tabuleiro[4][2].mill1[0]=tabuleiro[3][2];
-		tabuleiro[4][2].mill1[1]=tabuleiro[2][2];
-		tabuleiro[4][2].mill2[0]=tabuleiro[4][3];
-		tabuleiro[4][2].mill2[1]=tabuleiro[4][4];
+		board[4][2].adjacents=new Slot[2];
+		board[4][2].adjacents[0]=board[3][2];
+		board[4][2].adjacents[1]=board[4][3];
+		board[4][2].mill1[0]=board[3][2];
+		board[4][2].mill1[1]=board[2][2];
+		board[4][2].mill2[0]=board[4][3];
+		board[4][2].mill2[1]=board[4][4];
 		
-		tabuleiro[0][3].adjacents=new Slot[3];
-		tabuleiro[0][3].adjacents[0]=tabuleiro[0][0];
-		tabuleiro[0][3].adjacents[1]=tabuleiro[0][6];
-		tabuleiro[0][3].adjacents[2]=tabuleiro[1][3];
-		tabuleiro[0][3].mill1[0]=tabuleiro[0][0];
-		tabuleiro[0][3].mill1[1]=tabuleiro[0][6];
-		tabuleiro[0][3].mill2[0]=tabuleiro[1][3];
-		tabuleiro[0][3].mill2[1]=tabuleiro[2][3];
+		board[0][3].adjacents=new Slot[3];
+		board[0][3].adjacents[0]=board[0][0];
+		board[0][3].adjacents[1]=board[0][6];
+		board[0][3].adjacents[2]=board[1][3];
+		board[0][3].mill1[0]=board[0][0];
+		board[0][3].mill1[1]=board[0][6];
+		board[0][3].mill2[0]=board[1][3];
+		board[0][3].mill2[1]=board[2][3];
 		
-		tabuleiro[1][3].adjacents=new Slot[4];
-		tabuleiro[1][3].adjacents[0]=tabuleiro[0][3];
-		tabuleiro[1][3].adjacents[1]=tabuleiro[2][3];
-		tabuleiro[1][3].adjacents[2]=tabuleiro[1][1];
-		tabuleiro[1][3].adjacents[3]=tabuleiro[1][5];
-		tabuleiro[1][3].mill1[0]=tabuleiro[0][3];
-		tabuleiro[1][3].mill1[1]=tabuleiro[2][3];
-		tabuleiro[1][3].mill2[0]=tabuleiro[1][1];
-		tabuleiro[1][3].mill2[1]=tabuleiro[1][5];
+		board[1][3].adjacents=new Slot[4];
+		board[1][3].adjacents[0]=board[0][3];
+		board[1][3].adjacents[1]=board[2][3];
+		board[1][3].adjacents[2]=board[1][1];
+		board[1][3].adjacents[3]=board[1][5];
+		board[1][3].mill1[0]=board[0][3];
+		board[1][3].mill1[1]=board[2][3];
+		board[1][3].mill2[0]=board[1][1];
+		board[1][3].mill2[1]=board[1][5];
 		
-		tabuleiro[2][3].adjacents=new Slot[3];
-		tabuleiro[2][3].adjacents[0]=tabuleiro[1][3];
-		tabuleiro[2][3].adjacents[1]=tabuleiro[2][2];
-		tabuleiro[2][3].adjacents[2]=tabuleiro[2][4];
-		tabuleiro[2][3].mill1[0]=tabuleiro[1][3];
-		tabuleiro[2][3].mill1[1]=tabuleiro[0][3];
-		tabuleiro[2][3].mill2[0]=tabuleiro[2][2];
-		tabuleiro[2][3].mill2[1]=tabuleiro[2][4];
+		board[2][3].adjacents=new Slot[3];
+		board[2][3].adjacents[0]=board[1][3];
+		board[2][3].adjacents[1]=board[2][2];
+		board[2][3].adjacents[2]=board[2][4];
+		board[2][3].mill1[0]=board[1][3];
+		board[2][3].mill1[1]=board[0][3];
+		board[2][3].mill2[0]=board[2][2];
+		board[2][3].mill2[1]=board[2][4];
 		
-		tabuleiro[4][3].adjacents=new Slot[3];
-		tabuleiro[4][3].adjacents[0]=tabuleiro[4][2];
-		tabuleiro[4][3].adjacents[1]=tabuleiro[4][4];
-		tabuleiro[4][3].adjacents[2]=tabuleiro[5][3];
-		tabuleiro[4][3].mill1[0]=tabuleiro[4][2];
-		tabuleiro[4][3].mill1[1]=tabuleiro[4][4];
-		tabuleiro[4][3].mill2[0]=tabuleiro[5][3];
-		tabuleiro[4][3].mill2[1]=tabuleiro[6][3];
+		board[4][3].adjacents=new Slot[3];
+		board[4][3].adjacents[0]=board[4][2];
+		board[4][3].adjacents[1]=board[4][4];
+		board[4][3].adjacents[2]=board[5][3];
+		board[4][3].mill1[0]=board[4][2];
+		board[4][3].mill1[1]=board[4][4];
+		board[4][3].mill2[0]=board[5][3];
+		board[4][3].mill2[1]=board[6][3];
 		
-		tabuleiro[5][3].adjacents=new Slot[4];
-		tabuleiro[5][3].adjacents[0]=tabuleiro[4][3];
-		tabuleiro[5][3].adjacents[1]=tabuleiro[6][3];
-		tabuleiro[5][3].adjacents[2]=tabuleiro[5][1];
-		tabuleiro[5][3].adjacents[3]=tabuleiro[5][5];
-		tabuleiro[5][3].mill1[0]=tabuleiro[4][3];
-		tabuleiro[5][3].mill1[1]=tabuleiro[6][3];
-		tabuleiro[5][3].mill2[0]=tabuleiro[5][1];
-		tabuleiro[5][3].mill2[1]=tabuleiro[5][5];
+		board[5][3].adjacents=new Slot[4];
+		board[5][3].adjacents[0]=board[4][3];
+		board[5][3].adjacents[1]=board[6][3];
+		board[5][3].adjacents[2]=board[5][1];
+		board[5][3].adjacents[3]=board[5][5];
+		board[5][3].mill1[0]=board[4][3];
+		board[5][3].mill1[1]=board[6][3];
+		board[5][3].mill2[0]=board[5][1];
+		board[5][3].mill2[1]=board[5][5];
 		
-		tabuleiro[6][3].adjacents=new Slot[3];
-		tabuleiro[6][3].adjacents[0]=tabuleiro[6][0];
-		tabuleiro[6][3].adjacents[1]=tabuleiro[6][6];
-		tabuleiro[6][3].adjacents[2]=tabuleiro[5][3];
-		tabuleiro[6][3].mill1[0]=tabuleiro[6][0];
-		tabuleiro[6][3].mill1[1]=tabuleiro[6][6];
-		tabuleiro[6][3].mill2[0]=tabuleiro[5][3];
-		tabuleiro[6][3].mill2[1]=tabuleiro[4][3];
+		board[6][3].adjacents=new Slot[3];
+		board[6][3].adjacents[0]=board[6][0];
+		board[6][3].adjacents[1]=board[6][6];
+		board[6][3].adjacents[2]=board[5][3];
+		board[6][3].mill1[0]=board[6][0];
+		board[6][3].mill1[1]=board[6][6];
+		board[6][3].mill2[0]=board[5][3];
+		board[6][3].mill2[1]=board[4][3];
 		
-		tabuleiro[2][4].adjacents=new Slot[2];
-		tabuleiro[2][4].adjacents[0]=tabuleiro[2][3];
-		tabuleiro[2][4].adjacents[1]=tabuleiro[3][4];
-		tabuleiro[2][4].mill1[0]=tabuleiro[2][3];
-		tabuleiro[2][4].mill1[1]=tabuleiro[2][2];
-		tabuleiro[2][4].mill2[0]=tabuleiro[3][4];
-		tabuleiro[2][4].mill2[1]=tabuleiro[4][4];
+		board[2][4].adjacents=new Slot[2];
+		board[2][4].adjacents[0]=board[2][3];
+		board[2][4].adjacents[1]=board[3][4];
+		board[2][4].mill1[0]=board[2][3];
+		board[2][4].mill1[1]=board[2][2];
+		board[2][4].mill2[0]=board[3][4];
+		board[2][4].mill2[1]=board[4][4];
 		
-		tabuleiro[3][4].adjacents=new Slot[3];
-		tabuleiro[3][4].adjacents[0]=tabuleiro[2][4];
-		tabuleiro[3][4].adjacents[1]=tabuleiro[4][4];
-		tabuleiro[3][4].adjacents[2]=tabuleiro[3][5];
-		tabuleiro[3][4].mill1[0]=tabuleiro[2][4];
-		tabuleiro[3][4].mill1[1]=tabuleiro[4][4];
-		tabuleiro[3][4].mill2[0]=tabuleiro[3][5];
-		tabuleiro[3][4].mill2[1]=tabuleiro[3][6];
+		board[3][4].adjacents=new Slot[3];
+		board[3][4].adjacents[0]=board[2][4];
+		board[3][4].adjacents[1]=board[4][4];
+		board[3][4].adjacents[2]=board[3][5];
+		board[3][4].mill1[0]=board[2][4];
+		board[3][4].mill1[1]=board[4][4];
+		board[3][4].mill2[0]=board[3][5];
+		board[3][4].mill2[1]=board[3][6];
 		
-		tabuleiro[4][4].adjacents=new Slot[2];
-		tabuleiro[4][4].adjacents[0]=tabuleiro[4][3];
-		tabuleiro[4][4].adjacents[1]=tabuleiro[3][4];
-		tabuleiro[4][4].mill1[0]=tabuleiro[4][3];
-		tabuleiro[4][4].mill1[1]=tabuleiro[4][2];
-		tabuleiro[4][4].mill2[0]=tabuleiro[3][4];
-		tabuleiro[4][4].mill2[1]=tabuleiro[2][4];
+		board[4][4].adjacents=new Slot[2];
+		board[4][4].adjacents[0]=board[4][3];
+		board[4][4].adjacents[1]=board[3][4];
+		board[4][4].mill1[0]=board[4][3];
+		board[4][4].mill1[1]=board[4][2];
+		board[4][4].mill2[0]=board[3][4];
+		board[4][4].mill2[1]=board[2][4];
 		
-		tabuleiro[1][5].adjacents=new Slot[2];
-		tabuleiro[1][5].adjacents[0]=tabuleiro[1][3];
-		tabuleiro[1][5].adjacents[1]=tabuleiro[3][5];
-		tabuleiro[1][5].mill1[0]=tabuleiro[1][3];
-		tabuleiro[1][5].mill1[1]=tabuleiro[1][1];
-		tabuleiro[1][5].mill2[0]=tabuleiro[3][5];
-		tabuleiro[1][5].mill2[1]=tabuleiro[5][5];
+		board[1][5].adjacents=new Slot[2];
+		board[1][5].adjacents[0]=board[1][3];
+		board[1][5].adjacents[1]=board[3][5];
+		board[1][5].mill1[0]=board[1][3];
+		board[1][5].mill1[1]=board[1][1];
+		board[1][5].mill2[0]=board[3][5];
+		board[1][5].mill2[1]=board[5][5];
 		
-		tabuleiro[3][5].adjacents=new Slot[4];
-		tabuleiro[3][5].adjacents[0]=tabuleiro[1][5];
-		tabuleiro[3][5].adjacents[1]=tabuleiro[5][5];
-		tabuleiro[3][5].adjacents[2]=tabuleiro[3][4];
-		tabuleiro[3][5].adjacents[3]=tabuleiro[3][6];
-		tabuleiro[3][5].mill1[0]=tabuleiro[1][5];
-		tabuleiro[3][5].mill1[1]=tabuleiro[5][5];
-		tabuleiro[3][5].mill2[0]=tabuleiro[3][4];
-		tabuleiro[3][5].mill2[1]=tabuleiro[3][6];
+		board[3][5].adjacents=new Slot[4];
+		board[3][5].adjacents[0]=board[1][5];
+		board[3][5].adjacents[1]=board[5][5];
+		board[3][5].adjacents[2]=board[3][4];
+		board[3][5].adjacents[3]=board[3][6];
+		board[3][5].mill1[0]=board[1][5];
+		board[3][5].mill1[1]=board[5][5];
+		board[3][5].mill2[0]=board[3][4];
+		board[3][5].mill2[1]=board[3][6];
 		
-		tabuleiro[5][5].adjacents=new Slot[2];
-		tabuleiro[5][5].adjacents[0]=tabuleiro[5][3];
-		tabuleiro[5][5].adjacents[1]=tabuleiro[3][5];
-		tabuleiro[5][5].mill1[0]=tabuleiro[5][3];
-		tabuleiro[5][5].mill1[1]=tabuleiro[5][1];
-		tabuleiro[5][5].mill2[0]=tabuleiro[3][5];
-		tabuleiro[5][5].mill2[1]=tabuleiro[1][5];
+		board[5][5].adjacents=new Slot[2];
+		board[5][5].adjacents[0]=board[5][3];
+		board[5][5].adjacents[1]=board[3][5];
+		board[5][5].mill1[0]=board[5][3];
+		board[5][5].mill1[1]=board[5][1];
+		board[5][5].mill2[0]=board[3][5];
+		board[5][5].mill2[1]=board[1][5];
 		
-		tabuleiro[0][6].adjacents=new Slot[2];
-		tabuleiro[0][6].adjacents[0]=tabuleiro[0][3];
-		tabuleiro[0][6].adjacents[1]=tabuleiro[3][6];
-		tabuleiro[0][6].mill1[0]=tabuleiro[0][3];
-		tabuleiro[0][6].mill1[1]=tabuleiro[0][0];
-		tabuleiro[0][6].mill2[0]=tabuleiro[3][6];
-		tabuleiro[0][6].mill2[1]=tabuleiro[6][6];
+		board[0][6].adjacents=new Slot[2];
+		board[0][6].adjacents[0]=board[0][3];
+		board[0][6].adjacents[1]=board[3][6];
+		board[0][6].mill1[0]=board[0][3];
+		board[0][6].mill1[1]=board[0][0];
+		board[0][6].mill2[0]=board[3][6];
+		board[0][6].mill2[1]=board[6][6];
 		
-		tabuleiro[3][6].adjacents=new Slot[3];
-		tabuleiro[3][6].adjacents[0]=tabuleiro[0][6];
-		tabuleiro[3][6].adjacents[1]=tabuleiro[6][6];
-		tabuleiro[3][6].adjacents[2]=tabuleiro[3][5];
-		tabuleiro[3][6].mill1[0]=tabuleiro[0][6];
-		tabuleiro[3][6].mill1[1]=tabuleiro[6][6];
-		tabuleiro[3][6].mill2[0]=tabuleiro[3][5];
-		tabuleiro[3][6].mill2[1]=tabuleiro[3][4];
+		board[3][6].adjacents=new Slot[3];
+		board[3][6].adjacents[0]=board[0][6];
+		board[3][6].adjacents[1]=board[6][6];
+		board[3][6].adjacents[2]=board[3][5];
+		board[3][6].mill1[0]=board[0][6];
+		board[3][6].mill1[1]=board[6][6];
+		board[3][6].mill2[0]=board[3][5];
+		board[3][6].mill2[1]=board[3][4];
 		
-		tabuleiro[6][6].adjacents=new Slot[2];
-		tabuleiro[6][6].adjacents[0]=tabuleiro[6][3];
-		tabuleiro[6][6].adjacents[1]=tabuleiro[3][6];
-		tabuleiro[6][6].mill1[0]=tabuleiro[6][3];
-		tabuleiro[6][6].mill1[1]=tabuleiro[6][0];
-		tabuleiro[6][6].mill2[0]=tabuleiro[3][6];
-		tabuleiro[6][6].mill2[1]=tabuleiro[0][6];
+		board[6][6].adjacents=new Slot[2];
+		board[6][6].adjacents[0]=board[6][3];
+		board[6][6].adjacents[1]=board[3][6];
+		board[6][6].mill1[0]=board[6][3];
+		board[6][6].mill1[1]=board[6][0];
+		board[6][6].mill2[0]=board[3][6];
+		board[6][6].mill2[1]=board[0][6];
 		
 		
 	}
