@@ -125,12 +125,37 @@ public class Board {
 			}
 			pieces[i].coordx=500;
 			pieces[i].coordx_old=500;
+			pieces[i].xOnBoard_old=-1;
+			pieces[i].yOnBoard_old=-1;
+			pieces[i].xOnBoard=-1;
+			pieces[i].yOnBoard=-1;
+			
 			pieces[i].image.setBounds(pieces[i].coordx, pieces[i].coordy, 
 					pieces[i].mySize, pieces[i].mySize);
 		}
 		
 	}
 
+	public boolean valid_position()
+	{
+		if(piece_select==-1)
+		{
+			return false;
+		}
+		
+		if(pieces[piece_select].xOnBoard==-1)
+		{
+			return false;
+		}
+		
+		if(board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied)
+		{
+			return false;
+		}
+		//falta validar "stage" de jogo: 1- mover peças para tabuleiro 2-mover para adjacentes 3-voar peças
+		return true;
+	}
+	
 	private void init_mouse() {
 		
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
@@ -139,16 +164,29 @@ public class Board {
 					MouseEvent evt = (MouseEvent)event;
 					if(evt.getID() == MouseEvent.MOUSE_CLICKED ){
 						
-						
+						System.out.println("Click");
 					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED )
 					{
 						if(piece_select!=-1)
 						{
-							if(piece_onBoard)
+							if(piece_onBoard && valid_position())
 							{
-								//if valid position
+								
 								pieces[piece_select].coordx_old=pieces[piece_select].coordx;
 								pieces[piece_select].coordy_old=pieces[piece_select].coordy;
+								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].piece=pieces[piece_select];
+								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied=true;
+								if(pieces[piece_select].xOnBoard_old!=-1)
+								{
+									board[pieces[piece_select].xOnBoard_old][pieces[piece_select].yOnBoard_old].piece=null;
+									board[pieces[piece_select].xOnBoard_old][pieces[piece_select].yOnBoard_old].occupied=false;
+									
+									
+								}
+								pieces[piece_select].xOnBoard_old=pieces[piece_select].xOnBoard;
+								pieces[piece_select].yOnBoard_old=pieces[piece_select].yOnBoard;
+								
+								players[turn].nMoves++;
 								turn=change_turn(turn);
 							}else{
 								
@@ -197,6 +235,9 @@ public class Board {
 							}else{
 								pieces[piece_select].coordx=board[pos_oux[0]][pos_oux[1]].pixelx;
 								pieces[piece_select].coordy=board[pos_oux[0]][pos_oux[1]].pixely;
+								pieces[piece_select].xOnBoard=pos_oux[0];
+								pieces[piece_select].yOnBoard=pos_oux[1];
+								
 								piece_onBoard=true;
 							}
 													
@@ -204,9 +245,10 @@ public class Board {
 									pieces[piece_select].coordy, pieces[piece_select].mySize, 
 									pieces[piece_select].mySize);
 							
+							/*
 							System.out.println("pecaX: "+pieces[piece_select].coordx+
 											", pecaY: "+pieces[piece_select].coordy);
-							
+							*/
 						}
 						
 					}

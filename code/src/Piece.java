@@ -17,5 +17,10 @@ public class Piece {
 	public int deltx;
 	public int delty;
 	
+	public int xOnBoard;
+	public int yOnBoard;
+	public int xOnBoard_old;
+	public int yOnBoard_old;
+	
 	public int mySize;
 }
