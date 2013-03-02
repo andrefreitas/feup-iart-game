@@ -35,6 +35,7 @@ public class Board {
 	public Slot[][] board;//board[x][y].... x-> \\  y (para baixo)
 	public Player[] players;
 	public int turn;
+	public boolean remove_piece;
 	
 	public boolean piece_onBoard=false;
 	public int piece_select=-1;
@@ -83,6 +84,7 @@ public class Board {
 	public void init_players() {
 		
 		turn=0;
+		remove_piece=false;
 		
 		players=new Player[2];
 		players[0]=new Human();
@@ -188,6 +190,43 @@ public class Board {
 		return true;
 	}
 	
+	public boolean check_mills()
+	{
+		char oux_color=pieces[piece_select].color;
+		Slot[] oux_mill1=board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].mill1;
+		Slot[] oux_mill2=board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].mill2;
+		
+		if(oux_mill1[0].occupied && oux_mill1[1].occupied)
+		{
+			if(oux_mill1[0].piece.color==oux_color && oux_mill1[1].piece.color==oux_color)
+			{
+				return true;
+			}
+		}
+		
+		if(oux_mill2[0].occupied && oux_mill2[1].occupied)
+		{
+			if(oux_mill2[0].piece.color==oux_color && oux_mill2[1].piece.color==oux_color)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean valid_remove()
+	{
+		if(players[turn].color==pieces[piece_select].color && 
+				board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied)
+		{
+			//falta dar prioridade a peças que n formem mills.
+			return true;
+		}
+		
+		return false;
+	}
+	
 	private void init_mouse() {
 		
 		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
@@ -196,8 +235,48 @@ public class Board {
 					MouseEvent evt = (MouseEvent)event;
 					if(evt.getID() == MouseEvent.MOUSE_CLICKED ){
 						
-						System.out.println("Click");
-					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED )
+						if(remove_piece)
+						{
+							int mouseX=evt.getX()-10;
+							int mouseY=evt.getY()-30;
+							for(int i=0;i<pieces.length;i++)
+							{
+								if(pieces[i].coordx <= mouseX && (pieces[i].coordx+pieces[i].mySize) >= mouseX &&
+									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY &&
+									pieces[i].color == players[turn].color)
+								{
+									piece_select=i;
+									
+									//System.out.println("peca: "+i);
+									break;
+								}
+								
+							}
+							if(piece_select!=-1)
+							if(valid_remove())
+							{
+								
+								players[turn].nPieces--;
+								System.out.println("peça removida turn: "+turn);
+								pieces[piece_select].image.setBounds(1000, 1000, 1, 1);
+								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied=false;
+								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].piece=null;
+								pieces[piece_select].xOnBoard=-1;
+								pieces[piece_select].yOnBoard=-1;
+								pieces[piece_select].xOnBoard_old=-1;
+								pieces[piece_select].yOnBoard_old=-1;
+								pieces[piece_select].coordx=1000;
+								pieces[piece_select].coordy=1000;
+								pieces[piece_select].coordx_old=1000;
+								pieces[piece_select].coordy_old=1000;
+								
+								remove_piece=false;
+							}
+							piece_select=-1;
+						}
+						
+						//System.out.println("Click");
+					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED && remove_piece==false)
 					{
 						if(piece_select!=-1)
 						{
@@ -219,7 +298,15 @@ public class Board {
 								pieces[piece_select].yOnBoard_old=pieces[piece_select].yOnBoard;
 								
 								players[turn].nMoves++;
+								System.out.println("Jogada valida turn: "+turn);
 								turn=change_turn(turn);
+								
+								if(check_mills())
+								{
+									System.out.println("mill remover cor: "+turn);
+									remove_piece=true;
+								}
+								
 							}else{
 								
 								pieces[piece_select].coordx=pieces[piece_select].coordx_old;
@@ -232,7 +319,7 @@ public class Board {
 						}
 						piece_onBoard=false;
 						piece_select=-1;
-					}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED )
+					}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED && remove_piece==false)
 					{
 						int mouseX=evt.getX()-10;
 						int mouseY=evt.getY()-30;
