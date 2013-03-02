@@ -90,9 +90,11 @@ public class Board {
 		
 		players[0].color='p';
 		players[0].nMoves=0;
+		players[0].nPieces=9;
 		
 		players[1].color='b';
 		players[1].nMoves=0;
+		players[1].nPieces=9;
 	}
 
 	private void init_pieces() {
@@ -152,7 +154,37 @@ public class Board {
 		{
 			return false;
 		}
-		//falta validar "stage" de jogo: 1- mover peças para tabuleiro 2-mover para adjacentes 3-voar peças
+		
+		if(players[turn].nMoves<9)
+		{
+			//"stage 1"
+			
+			if(pieces[piece_select].xOnBoard_old!=-1)
+				return false;
+		}else if(players[turn].nPieces>3)
+		{
+			//"stage 2"
+			boolean found=false;
+			for(int i=0;i<board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents.length;i++)
+			{
+				if(board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents[i].x==
+						pieces[piece_select].xOnBoard_old &&
+				   board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents[i].y==
+						pieces[piece_select].yOnBoard_old) 
+						
+				{
+					found=true;
+				}
+			}
+			if(found==false)
+				return false;
+		}else
+		{
+			//"stage 3"
+			
+			
+		}
+		//falta validar "stage" de jogo: 3-voar peças
 		return true;
 	}
 	
