@@ -33,9 +33,10 @@ public class Board {
 	
 	
 	public Slot[][] board;//board[x][y].... x-> \\  y (para baixo)
-	public Player player1;
-	public Player player2;
+	public Player[] players;
+	public int turn;
 	
+	public boolean piece_onBoard=false;
 	public int piece_select=-1;
 	public Piece[] pieces;
 	
@@ -43,6 +44,8 @@ public class Board {
 	{
 		init_slots();
 		init_pieces();
+		
+		init_players();
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setPreferredSize(new Dimension(800,538));
@@ -71,6 +74,27 @@ public class Board {
 		window.setVisible(true);
 	}
 	
+	public int change_turn(int t)
+	{
+		
+		return t*(-1)+1;
+	}
+	
+	public void init_players() {
+		
+		turn=0;
+		
+		players=new Player[2];
+		players[0]=new Human();
+		players[1]=new Human();
+		
+		players[0].color='p';
+		players[0].nMoves=0;
+		
+		players[1].color='b';
+		players[1].nMoves=0;
+	}
+
 	private void init_pieces() {
 		
 		pieces=new Piece[18];
@@ -118,6 +142,25 @@ public class Board {
 						
 					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED )
 					{
+						if(piece_select!=-1)
+						{
+							if(piece_onBoard)
+							{
+								//if valid position
+								pieces[piece_select].coordx_old=pieces[piece_select].coordx;
+								pieces[piece_select].coordy_old=pieces[piece_select].coordy;
+								turn=change_turn(turn);
+							}else{
+								
+								pieces[piece_select].coordx=pieces[piece_select].coordx_old;
+								pieces[piece_select].coordy=pieces[piece_select].coordy_old;
+								pieces[piece_select].image.setBounds(pieces[piece_select].coordx, 
+										pieces[piece_select].coordy, pieces[piece_select].mySize, 
+										pieces[piece_select].mySize);
+							}
+							
+						}
+						piece_onBoard=false;
 						piece_select=-1;
 					}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED )
 					{
@@ -132,7 +175,8 @@ public class Board {
 							for(int i=0;i<pieces.length;i++)
 							{
 								if(pieces[i].coordx <= mouseX && (pieces[i].coordx+pieces[i].mySize) >= mouseX &&
-									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY)
+									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY &&
+									pieces[i].color == players[turn].color)
 								{
 									piece_select=i;
 									pieces[i].deltx=mouseX-pieces[i].coordx;
@@ -152,6 +196,7 @@ public class Board {
 							}else{
 								pieces[piece_select].coordx=board[pos_oux[0]][pos_oux[1]].pixelx;
 								pieces[piece_select].coordy=board[pos_oux[0]][pos_oux[1]].pixely;
+								piece_onBoard=true;
 							}
 													
 							pieces[piece_select].image.setBounds(pieces[piece_select].coordx, 
