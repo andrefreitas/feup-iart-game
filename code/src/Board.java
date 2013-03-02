@@ -193,6 +193,7 @@ public class Board {
 							{
 								pieces[piece_select].coordx=mouseX-pieces[piece_select].deltx;
 								pieces[piece_select].coordy=mouseY-pieces[piece_select].delty;
+								piece_onBoard=false;
 							}else{
 								pieces[piece_select].coordx=board[pos_oux[0]][pos_oux[1]].pixelx;
 								pieces[piece_select].coordy=board[pos_oux[0]][pos_oux[1]].pixely;
