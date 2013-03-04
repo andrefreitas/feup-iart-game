@@ -1,26 +1,34 @@
+import java.awt.Point;
 import javax.swing.JLabel;
 
-
-public class Piece {
-	
+public class Piece 
+{	
 	public JLabel image;
-	public JLabel white;
-	public JLabel black;
 	
 	public boolean active;
-	public char color; //'p'-preta, 'b'-branca;
+		
+	public Player owner; //substitui a cor, permite mais funcionalidade com menos código
 	
-	public int coordx;
-	public int coordy;
-	public int coordx_old;
-	public int coordy_old;
-	public int deltx;
-	public int delty;
+	public Point coord = new Point();
+	public Point coord_old = new Point();
+	public Point delt = new Point();
 	
-	public int xOnBoard;
-	public int yOnBoard;
-	public int xOnBoard_old;
-	public int yOnBoard_old;
+	public Slot OnBoard;
+	public Slot OnBoardOld;
 	
-	public int mySize;
+	public final int mySize=47;
+	
+	public Piece(int x, int y, Player owner, JLabel image)
+	{
+		coord.setLocation(x,y);
+		coord_old.setLocation(x,y);		
+		this.owner=owner;
+		this.image=image;
+				
+		active=true;
+		OnBoard=null;
+		OnBoardOld=null;
+		
+		image.setBounds(coord.x, coord.y, mySize, mySize);
+	}
 }

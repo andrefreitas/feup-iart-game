@@ -1,8 +1,5 @@
-import java.awt.AWTEvent;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 
@@ -10,43 +7,32 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+public class Board 
+{
 
-public class Board {
-
-	static URL url11 = 
-			ClassLoader.getSystemClassLoader().
-			getResource("images/pecabranca.png");
-	private static ImageIcon iconbranca = new ImageIcon(url11);
-	static URL url12 = 
-			ClassLoader.getSystemClassLoader().
-			getResource("images/pecapreta.png");
-	private static ImageIcon iconpreta = new ImageIcon(url12);
-	
-	
-	public URL url1 = 
-			ClassLoader.getSystemClassLoader().
-			getResource("images/fundo2.png");
-	public ImageIcon icontabuleiro = new ImageIcon(url1);
+	public URL url1 = ClassLoader.getSystemClassLoader().getResource("images/fundo2.png");
+	public ImageIcon icontabuleiro = new ImageIcon(url1);	
+	static URL url11 = ClassLoader.getSystemClassLoader().getResource("images/pecabranca.png");
+	static URL url12 = ClassLoader.getSystemClassLoader().getResource("images/pecapreta.png");	
 	
 	public JFrame window = new JFrame();
-	public JLabel background;
+	public JLabel background;	
 	
-	
-	public Slot[][] board;//board[x][y].... x-> \\  y (para baixo)
+	public Slot[][] board;//board[x][y].... x-> \\  y (para baixo)  ...(ou board[linha][coluna])
 	public Player[] players;
 	public int turn;
-	public boolean remove_piece;
 	
-	public boolean piece_onBoard=false;
-	public int piece_select=-1;
 	public Piece[] pieces;
 	
+	public boolean remove_piece;	
+	public boolean piece_onBoard=false;
+	public Piece selectedPiece=null;
+		
 	public Board()
 	{
 		init_slots();
-		init_pieces();
-		
 		init_players();
+		init_pieces();		
 		
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setPreferredSize(new Dimension(800,538));
@@ -66,13 +52,42 @@ public class Board {
 		a.add(background);
 		window.setContentPane(a);
 		
-		
-		init_mouse();
-		
-		
+				
 		window.repaint();
 		window.pack();
 		window.setVisible(true);
+		
+		runGame();
+	}
+	
+	public void runGame()
+	{
+		Player winner;
+		
+		players[turn].play();
+		while(true)
+		{
+			if(players[turn].finishedPlay)
+			{
+				players[turn].finishedPlay=false;
+				turn=change_turn(turn);
+				players[turn].play();
+				
+				winner=gameOver();
+				if(winner!=null)
+					break;
+			}
+		}
+	}
+	
+	/**
+	 * Método que permite saber se o jogo acabou.
+	 * @return Null se o jogo ainda não acabou ou o jogador vencedor.
+	 */
+	public Player gameOver()
+	{
+		//TODO COMPLETA-ME!
+		return null;
 	}
 	
 	public int change_turn(int t)
@@ -81,78 +96,42 @@ public class Board {
 		return t*(-1)+1;
 	}
 	
-	public void init_players() {
-		
-		turn=0;
+	public void init_players() 
+	{		
+		turn=(int) (Math.random()*2);
 		remove_piece=false;
 		
 		players=new Player[2];
-		players[0]=new Human();
-		players[1]=new Human();
-		
-		players[0].color='p';
-		players[0].nMoves=0;
-		players[0].nPieces=9;
-		
-		players[1].color='b';
-		players[1].nMoves=0;
-		players[1].nPieces=9;
+		players[0]=new Human("Jogador 0",0,9,'p',this);
+		players[1]=new Human("Jogador 1",0,9,'b',this);
 	}
 
-	private void init_pieces() {
+	private void init_pieces() 
+	{
 		
 		pieces=new Piece[18];
 		for(int i=0;i<18;i++)
-		{
-			pieces[i]=new Piece();
-			pieces[i].mySize=47;
-			
-			pieces[i].black=new JLabel(iconpreta);
-			//pieces[i].black.setBounds(xcoord,ycoord,tamanho,tamanho);
-			pieces[i].white=new JLabel(iconbranca);
-			//pieces[i].white.setBounds(xcoord,ycoord,tamanho,tamanho);
-			
-			
-			pieces[i].active=true;
-			pieces[i].color='b';
-			
-			pieces[i].image=pieces[i].white;
-			pieces[i].coordy=327;
-			pieces[i].coordy_old=327;
+		{						
 			if(i<9)
-			{
-				pieces[i].color='p';
-				pieces[i].image=pieces[i].black;
-				pieces[i].coordy=50;
-				pieces[i].coordy_old=50;
-				
-			}
-			pieces[i].coordx=500;
-			pieces[i].coordx_old=500;
-			pieces[i].xOnBoard_old=-1;
-			pieces[i].yOnBoard_old=-1;
-			pieces[i].xOnBoard=-1;
-			pieces[i].yOnBoard=-1;
-			
-			pieces[i].image.setBounds(pieces[i].coordx, pieces[i].coordy, 
-					pieces[i].mySize, pieces[i].mySize);
-		}
-		
+				pieces[i]=new Piece(500,50,players[0],new JLabel(new ImageIcon(url12)));	
+			else
+				pieces[i]=new Piece(500,327,players[1],new JLabel(new ImageIcon(url11)));
+		}		
 	}
 
 	public boolean valid_position()
 	{
-		if(piece_select==-1)
+		if(selectedPiece==null)
 		{
 			return false;
 		}
 		
-		if(pieces[piece_select].xOnBoard==-1)
+		if(selectedPiece.OnBoard==null)
 		{
 			return false;
 		}
 		
-		if(board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied)
+		if(selectedPiece.OnBoard.occupied())
 		{
 			return false;
 		}
@@ -161,26 +140,26 @@ public class Board {
 		{
 			//"stage 1"
 			
-			if(pieces[piece_select].xOnBoard_old!=-1)
+			if(selectedPiece.OnBoardOld!=null)
 				return false;
-		}else if(players[turn].nPieces>3)
+		}
+		else if(players[turn].nPieces>3)
 		{
+			System.out.println("AQUI");
 			//"stage 2"
 			boolean found=false;
-			for(int i=0;i<board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents.length;i++)
+			Slot[] adjacents = selectedPiece.OnBoard.adjacents;
+			
+			for(int i=0;i<adjacents.length;i++)
 			{
-				if(board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents[i].x==
-						pieces[piece_select].xOnBoard_old &&
-				   board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].adjacents[i].y==
-						pieces[piece_select].yOnBoard_old) 
-						
-				{
+				if(adjacents[i].line==selectedPiece.OnBoardOld.line && adjacents[i].column==selectedPiece.OnBoardOld.column) 
 					found=true;
-				}
 			}
+			
 			if(found==false)
 				return false;
-		}else
+		}
+		else
 		{
 			//"stage 3"
 			
@@ -192,21 +171,21 @@ public class Board {
 	
 	public boolean check_mills()
 	{
-		char oux_color=pieces[piece_select].color;
-		Slot[] oux_mill1=board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].mill1;
-		Slot[] oux_mill2=board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].mill2;
+		Player owner=selectedPiece.owner;
+		Slot[] oux_mill1=selectedPiece.OnBoard.verticalMill;
+		Slot[] oux_mill2=selectedPiece.OnBoard.horizontalMill;
 		
-		if(oux_mill1[0].occupied && oux_mill1[1].occupied)
+		if(oux_mill1[0].occupied() && oux_mill1[1].occupied())
 		{
-			if(oux_mill1[0].piece.color==oux_color && oux_mill1[1].piece.color==oux_color)
+			if(oux_mill1[0].occupyingPiece.owner==owner && oux_mill1[1].occupyingPiece.owner==owner)
 			{
 				return true;
 			}
 		}
 		
-		if(oux_mill2[0].occupied && oux_mill2[1].occupied)
+		if(oux_mill2[0].occupied() && oux_mill2[1].occupied())
 		{
-			if(oux_mill2[0].piece.color==oux_color && oux_mill2[1].piece.color==oux_color)
+			if(oux_mill2[0].occupyingPiece.owner==owner && oux_mill2[1].occupyingPiece.owner==owner)
 			{
 				return true;
 			}
@@ -217,8 +196,7 @@ public class Board {
 	
 	public boolean valid_remove()
 	{
-		if(players[turn].color==pieces[piece_select].color && 
-				board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied)
+		if(players[turn]==selectedPiece.owner && selectedPiece.OnBoard.occupied())
 		{
 			//falta dar prioridade a peças que n formem mills.
 			return true;
@@ -227,165 +205,147 @@ public class Board {
 		return false;
 	}
 	
-	private void init_mouse() {
+	/**
+	 * Método que processa as jogadas dos jogadores humanos. Deve ser invocado pelo método play dos jogadores humanos quando estes detetam interacção do jogador.
+	 * @param evt MouseEvent que disparou a jogada.
+	 * @return True se evento resulta numa jogada e o turno deve ser passado ao próximo jogador.
+	 */
+	public boolean processPlayAttempt(MouseEvent evt)
+	{
+		boolean madePlay=false;
 		
-		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-			public void eventDispatched(AWTEvent event) {
-				if(event instanceof MouseEvent){
-					MouseEvent evt = (MouseEvent)event;
-					if(evt.getID() == MouseEvent.MOUSE_CLICKED ){
-						
-						if(remove_piece)
-						{
-							int mouseX=evt.getX()-10;
-							int mouseY=evt.getY()-30;
-							for(int i=0;i<pieces.length;i++)
-							{
-								if(pieces[i].coordx <= mouseX && (pieces[i].coordx+pieces[i].mySize) >= mouseX &&
-									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY &&
-									pieces[i].color == players[turn].color)
-								{
-									piece_select=i;
-									
-									//System.out.println("peca: "+i);
-									break;
-								}
-								
-							}
-							if(piece_select!=-1)
-							if(valid_remove())
-							{
-								
-								players[turn].nPieces--;
-								System.out.println("peça removida turn: "+turn);
-								pieces[piece_select].image.setBounds(1000, 1000, 1, 1);
-								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied=false;
-								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].piece=null;
-								pieces[piece_select].xOnBoard=-1;
-								pieces[piece_select].yOnBoard=-1;
-								pieces[piece_select].xOnBoard_old=-1;
-								pieces[piece_select].yOnBoard_old=-1;
-								pieces[piece_select].coordx=1000;
-								pieces[piece_select].coordy=1000;
-								pieces[piece_select].coordx_old=1000;
-								pieces[piece_select].coordy_old=1000;
-								
-								remove_piece=false;
-							}
-							piece_select=-1;
-						}
-						
-						//System.out.println("Click");
-					}else if(evt.getID() == MouseEvent.MOUSE_RELEASED && remove_piece==false)
+		if(evt.getID() == MouseEvent.MOUSE_CLICKED ){
+			
+			if(remove_piece)
+			{
+				int mouseX=evt.getX()-10;
+				int mouseY=evt.getY()-30;
+				for(int i=0;i<pieces.length;i++)
+				{
+					if(pieces[i].coord.x <= mouseX && (pieces[i].coord.x+pieces[i].mySize) >= mouseX &&
+						pieces[i].coord.y <= mouseY && (pieces[i].coord.y+pieces[i].mySize) >= mouseY &&
+						pieces[i].owner == players[turn])
 					{
-						if(piece_select!=-1)
-						{
-							if(piece_onBoard && valid_position())
-							{
-								
-								pieces[piece_select].coordx_old=pieces[piece_select].coordx;
-								pieces[piece_select].coordy_old=pieces[piece_select].coordy;
-								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].piece=pieces[piece_select];
-								board[pieces[piece_select].xOnBoard][pieces[piece_select].yOnBoard].occupied=true;
-								if(pieces[piece_select].xOnBoard_old!=-1)
-								{
-									board[pieces[piece_select].xOnBoard_old][pieces[piece_select].yOnBoard_old].piece=null;
-									board[pieces[piece_select].xOnBoard_old][pieces[piece_select].yOnBoard_old].occupied=false;
-									
-									
-								}
-								pieces[piece_select].xOnBoard_old=pieces[piece_select].xOnBoard;
-								pieces[piece_select].yOnBoard_old=pieces[piece_select].yOnBoard;
-								
-								players[turn].nMoves++;
-								System.out.println("Jogada valida turn: "+turn);
-								turn=change_turn(turn);
-								
-								if(check_mills())
-								{
-									System.out.println("mill remover cor: "+turn);
-									remove_piece=true;
-								}
-								
-							}else{
-								
-								pieces[piece_select].coordx=pieces[piece_select].coordx_old;
-								pieces[piece_select].coordy=pieces[piece_select].coordy_old;
-								pieces[piece_select].image.setBounds(pieces[piece_select].coordx, 
-										pieces[piece_select].coordy, pieces[piece_select].mySize, 
-										pieces[piece_select].mySize);
-							}
-							
-						}
-						piece_onBoard=false;
-						piece_select=-1;
-					}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED && remove_piece==false)
+						selectedPiece=pieces[i];
+						
+						//System.out.println("peca: "+i);
+						break;
+					}
+					
+				}
+				if(selectedPiece!=null)
+				if(valid_remove())
+				{
+					
+					players[turn].nPieces--;
+					System.out.println("peça removida turn: "+turn);
+					selectedPiece.image.setBounds(1000, 1000, 1, 1);
+					selectedPiece.OnBoard.occupyingPiece=null;
+					selectedPiece.OnBoard=null;
+					selectedPiece.OnBoardOld=null;
+					selectedPiece.coord.setLocation(1000, 1000);
+					selectedPiece.coord_old.setLocation(1000, 1000);
+					
+					remove_piece=false;
+				}
+				selectedPiece=null;
+			}
+			
+			//System.out.println("Click");
+		}else if(evt.getID() == MouseEvent.MOUSE_RELEASED && remove_piece==false)
+		{
+			if(selectedPiece!=null)
+			{
+				if(piece_onBoard && valid_position())
+				{
+					
+					selectedPiece.coord_old.setLocation(selectedPiece.coord);
+					selectedPiece.OnBoard.occupyingPiece=selectedPiece;
+					if(selectedPiece.OnBoardOld!=null)
 					{
-						int mouseX=evt.getX()-10;
-						int mouseY=evt.getY()-30;
+						selectedPiece.OnBoardOld.occupyingPiece=null;
 						
-						
-						
-						//System.out.println("mouseX: "+mouseX+", mouseY: "+mouseY);
-						
-						if(piece_select == -1){
-							for(int i=0;i<pieces.length;i++)
-							{
-								if(pieces[i].coordx <= mouseX && (pieces[i].coordx+pieces[i].mySize) >= mouseX &&
-									pieces[i].coordy <= mouseY && (pieces[i].coordy+pieces[i].mySize) >= mouseY &&
-									pieces[i].color == players[turn].color)
-								{
-									piece_select=i;
-									pieces[i].deltx=mouseX-pieces[i].coordx;
-									pieces[i].delty=mouseY-pieces[i].coordy;
-									//System.out.println("peca: "+i);
-									break;
-								}
-								
-							}
-						}else{
-							
-							int[] pos_oux=piece_pos_board(mouseX,mouseY,pieces[piece_select].mySize);
-							if(pos_oux[0]==-1)
-							{
-								pieces[piece_select].coordx=mouseX-pieces[piece_select].deltx;
-								pieces[piece_select].coordy=mouseY-pieces[piece_select].delty;
-								piece_onBoard=false;
-							}else{
-								pieces[piece_select].coordx=board[pos_oux[0]][pos_oux[1]].pixelx;
-								pieces[piece_select].coordy=board[pos_oux[0]][pos_oux[1]].pixely;
-								pieces[piece_select].xOnBoard=pos_oux[0];
-								pieces[piece_select].yOnBoard=pos_oux[1];
-								
-								piece_onBoard=true;
-							}
-													
-							pieces[piece_select].image.setBounds(pieces[piece_select].coordx, 
-									pieces[piece_select].coordy, pieces[piece_select].mySize, 
-									pieces[piece_select].mySize);
-							
-							/*
-							System.out.println("pecaX: "+pieces[piece_select].coordx+
-											", pecaY: "+pieces[piece_select].coordy);
-							*/
-						}
 						
 					}
-
-					window.repaint();
+					selectedPiece.OnBoardOld=selectedPiece.OnBoard;
+					
+					players[turn].nMoves++;
+					System.out.println("Jogada valida turn: "+turn);
+					madePlay=true;
+					
+					if(check_mills())
+					{
+						System.out.println("mill remover cor: "+turn);
+						remove_piece=true;
+					}
+					
+				}else{
+					selectedPiece.coord.setLocation(selectedPiece.coord_old);
+					selectedPiece.image.setBounds(selectedPiece.coord.x, 
+							selectedPiece.coord.y, selectedPiece.mySize, 
+							selectedPiece.mySize);
 				}
+				
 			}
-
+			piece_onBoard=false;
+			selectedPiece=null;
+		}else if(evt.getID() == MouseEvent.MOUSE_DRAGGED && remove_piece==false)
+		{
+			int mouseX=evt.getX()-10;
+			int mouseY=evt.getY()-30;
 			
-		}, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+			
+			
+			//System.out.println("mouseX: "+mouseX+", mouseY: "+mouseY);
+			
+			if(selectedPiece == null){
+				for(int i=0;i<pieces.length;i++)
+				{
+					if(pieces[i].coord.x <= mouseX && (pieces[i].coord.x+pieces[i].mySize) >= mouseX &&
+						pieces[i].coord.y <= mouseY && (pieces[i].coord.y+pieces[i].mySize) >= mouseY &&
+						pieces[i].owner == players[turn])
+					{
+						selectedPiece=pieces[i];
+						pieces[i].delt.setLocation(mouseX-pieces[i].coord.x,mouseY-pieces[i].coord.y);
+						//System.out.println("peca: "+i);
+						break;
+					}
+					
+				}
+			}else{
+				
+				Slot pos_oux=getSlotAtPos(mouseX,mouseY,selectedPiece.mySize);
+				if(pos_oux==null)
+				{
+					selectedPiece.coord.setLocation(mouseX-selectedPiece.delt.x,mouseY-selectedPiece.delt.y);
+					piece_onBoard=false;
+				}else{
+					selectedPiece.coord.setLocation(pos_oux.pixelX,pos_oux.pixelY);
+					selectedPiece.OnBoard=pos_oux;
+					
+					piece_onBoard=true;
+				}
+										
+				selectedPiece.image.setBounds(selectedPiece.coord.x, 
+						selectedPiece.coord.y, selectedPiece.mySize, 
+						selectedPiece.mySize);
+				
+				/*
+				System.out.println("pecaX: "+pieces[piece_select].coordx+
+								", pecaY: "+pieces[piece_select].coordy);
+				*/
+			}
+			
+		}
+
+		window.repaint();
 		
+		return madePlay;
 	}
 	
-	
-	public int[] piece_pos_board(int mouseX, int mouseY, int mySize) {
-		int[] ret=new int[2];
-		ret[0]=-1;
-		ret[1]=-1;
+	public Slot getSlotAtPos(int mouseX, int mouseY, int mySize) 
+	{
+		Slot ret=null;
 		
 		for(int i=0;i<7;i++)
 		{
@@ -393,405 +353,93 @@ public class Board {
 			{
 				if(board[i][e]!=null)
 				{
-					if(board[i][e].pixelx <= mouseX && (board[i][e].pixelx+mySize)>=mouseX &&
-							board[i][e].pixely<=mouseY && (board[i][e].pixely+mySize)>=mouseY)
+					if(board[i][e].pixelX <= mouseX && (board[i][e].pixelX+mySize)>=mouseX &&
+							board[i][e].pixelY<=mouseY && (board[i][e].pixelY+mySize)>=mouseY)
 					{
-						ret[0]=i;
-						ret[1]=e;
+						ret=board[i][e];
 						break;
 					}
 				}
-			}
-			
-		}
-		
+			}			
+		}		
 		
 		return ret;
 	}
 
 
 	public void init_slots()
-	{
+	{		
+		board = new Slot[7][7];
 		
-		board= new Slot[7][7];
-		board[0][0]=new Slot();
-		board[0][0].occupied=false;
-		board[0][0].x=0;
-		board[0][0].y=0;
-		board[0][0].pixelx=30;
-		board[0][0].pixely=20;
+		//Construir slots
+		board[0][0]=new Slot(0,0,30,20);		
+		board[0][3]=new Slot(0,3,30,222);			
+		board[0][6]=new Slot(0,6,30,428);		
 		
-		board[0][3]=new Slot();
-		board[0][3].occupied=false;
-		board[0][3].x=0;
-		board[0][3].y=3;
-		board[0][3].pixelx=30;
-		board[0][3].pixely=222;
+		board[1][1]=new Slot(1,1,102,85);	
+		board[1][3]=new Slot(1,3,102,222);		
+		board[1][5]=new Slot(1,5,102,360);
 		
-		board[0][6]=new Slot();
-		board[0][6].occupied=false;
-		board[0][6].x=0;
-		board[0][6].y=6;
-		board[0][6].pixelx=30;
-		board[0][6].pixely=428;
+		board[2][2]=new Slot(2,2,174,154);		
+		board[2][3]=new Slot(2,3,174,222);		
+		board[2][4]=new Slot(2,4,174,290);
 		
-		board[1][1]=new Slot();
-		board[1][1].occupied=false;
-		board[1][1].x=1;
-		board[1][1].y=1;
-		board[1][1].pixelx=102;
-		board[1][1].pixely=85;
+		board[3][0]=new Slot(3,0,245,20);		
+		board[3][1]=new Slot(3,1,245,85);		
+		board[3][2]=new Slot(3,2,245,154);	
+		board[3][4]=new Slot(3,4,245,290);	
+		board[3][5]=new Slot(3,5,245,360);	
+		board[3][6]=new Slot(3,6,245,428);
 		
-		board[1][3]=new Slot();
-		board[1][3].occupied=false;
-		board[1][3].x=1;
-		board[1][3].y=3;
-		board[1][3].pixelx=102;
-		board[1][3].pixely=222;
+		board[4][2]=new Slot(4,2,315,154);
+		board[4][3]=new Slot(4,3,315,222);	
+		board[4][4]=new Slot(4,4,315,290);
 		
-		board[1][5]=new Slot();
-		board[1][5].occupied=false;
-		board[1][5].x=1;
-		board[1][5].y=5;
-		board[1][5].pixelx=102;
-		board[1][5].pixely=360;
+		board[5][1]=new Slot(5,1,386,85);	
+		board[5][3]=new Slot(5,3,386,222);		
+		board[5][5]=new Slot(5,5,386,360);
 		
-		board[2][2]=new Slot();
-		board[2][2].occupied=false;
-		board[2][2].x=2;
-		board[2][2].y=2;
-		board[2][2].pixelx=174;
-		board[2][2].pixely=154;
+		board[6][0]=new Slot(6,0,456,20);	
+		board[6][3]=new Slot(6,3,456,222);	
+		board[6][6]=new Slot(6,6,456,428);
 		
-		board[2][3]=new Slot();
-		board[2][3].occupied=false;
-		board[2][3].x=2;
-		board[2][3].y=3;
-		board[2][3].pixelx=174;
-		board[2][3].pixely=222;
+		//Definir adjacências
+		board[0][0].setAdjacents(board[0][3], board[3][0], null, null);
+		board[0][3].setAdjacents(board[0][0], board[0][6], board[1][3], null);
+		board[0][6].setAdjacents(board[0][3], board[3][6], null, null);
 		
-		board[2][4]=new Slot();
-		board[2][4].occupied=false;
-		board[2][4].x=2;
-		board[2][4].y=4;
-		board[2][4].pixelx=174;
-		board[2][4].pixely=290;
+		board[1][1].setAdjacents(board[3][1], board[1][3], null, null);
+		board[1][3].setAdjacents(board[0][3], board[2][3], board[1][1], board[1][5]);
+		board[1][5].setAdjacents(board[1][3], board[3][5], null, null);
 		
-		board[3][0]=new Slot();
-		board[3][0].occupied=false;
-		board[3][0].x=3;
-		board[3][0].y=0;
-		board[3][0].pixelx=245;
-		board[3][0].pixely=20;
+		board[2][2].setAdjacents(board[3][2], board[2][3], null, null);
+		board[2][3].setAdjacents(board[1][3], board[2][2], board[2][4], null);
+		board[2][4].setAdjacents(board[2][3], board[3][4], null, null);
 		
-		board[3][1]=new Slot();
-		board[3][1].occupied=false;
-		board[3][1].x=3;
-		board[3][1].y=1;
-		board[3][1].pixelx=245;
-		board[3][1].pixely=85;
+		board[3][0].setAdjacents(board[0][0], board[6][0], board[3][1], null);	
+		board[3][1].setAdjacents(board[1][1], board[5][1], board[3][2], board[3][0]);
+		board[3][2].setAdjacents(board[2][2], board[4][2], board[3][1], null);
+		board[3][4].setAdjacents(board[2][4], board[4][4], board[3][5], null);
+		board[3][5].setAdjacents(board[1][5], board[5][5], board[3][4], board[3][6]);
+		board[3][6].setAdjacents(board[0][6], board[6][6], board[3][5], null);
 		
-		board[3][2]=new Slot();
-		board[3][2].occupied=false;
-		board[3][2].x=3;
-		board[3][2].y=2;
-		board[3][2].pixelx=245;
-		board[3][2].pixely=154;
+		board[4][2].setAdjacents(board[3][2], board[4][3], null, null);	
+		board[4][3].setAdjacents(board[4][2], board[4][4], board[5][3], null);
+		board[4][4].setAdjacents(board[4][3], board[3][4], null, null);
 		
-		board[3][4]=new Slot();
-		board[3][4].occupied=false;
-		board[3][4].x=3;
-		board[3][4].y=4;
-		board[3][4].pixelx=245;
-		board[3][4].pixely=290;
+		board[5][1].setAdjacents(board[3][1], board[5][3], null, null);
+		board[5][3].setAdjacents(board[4][3], board[6][3], board[5][1], board[5][5]);
+		board[5][5].setAdjacents(board[5][3], board[3][5], null, null);
 		
-		board[3][5]=new Slot();
-		board[3][5].occupied=false;
-		board[3][5].x=3;
-		board[3][5].y=5;
-		board[3][5].pixelx=245;
-		board[3][5].pixely=360;
-		
-		board[3][6]=new Slot();
-		board[3][6].occupied=false;
-		board[3][6].x=3;
-		board[3][6].y=6;
-		board[3][6].pixelx=245;
-		board[3][6].pixely=428;
-		
-		board[4][2]=new Slot();
-		board[4][2].occupied=false;
-		board[4][2].x=4;
-		board[4][2].y=2;
-		board[4][2].pixelx=315;
-		board[4][2].pixely=154;
-		
-		board[4][3]=new Slot();
-		board[4][3].occupied=false;
-		board[4][3].x=4;
-		board[4][3].y=3;
-		board[4][3].pixelx=315;
-		board[4][3].pixely=222;
-		
-		board[4][4]=new Slot();
-		board[4][4].occupied=false;
-		board[4][4].x=4;
-		board[4][4].y=4;
-		board[4][4].pixelx=315;
-		board[4][4].pixely=290;
-		
-		board[5][1]=new Slot();
-		board[5][1].occupied=false;
-		board[5][1].x=5;
-		board[5][1].y=1;
-		board[5][1].pixelx=386;
-		board[5][1].pixely=85;
-		
-		board[5][3]=new Slot();
-		board[5][3].occupied=false;
-		board[5][3].x=5;
-		board[5][3].y=3;
-		board[5][3].pixelx=386;
-		board[5][3].pixely=222;
-		
-		board[5][5]=new Slot();
-		board[5][5].occupied=false;
-		board[5][5].x=5;
-		board[5][5].y=5;
-		board[5][5].pixelx=386;
-		board[5][5].pixely=360;
-		
-		board[6][0]=new Slot();
-		board[6][0].occupied=false;
-		board[6][0].x=6;
-		board[6][0].y=0;
-		board[6][0].pixelx=456;
-		board[6][0].pixely=20;
-		
-		board[6][3]=new Slot();
-		board[6][3].occupied=false;
-		board[6][3].x=6;
-		board[6][3].y=3;
-		board[6][3].pixelx=456;
-		board[6][3].pixely=222;
-		
-		board[6][6]=new Slot();
-		board[6][6].occupied=false;
-		board[6][6].x=6;
-		board[6][6].y=6;
-		board[6][6].pixelx=456;
-		board[6][6].pixely=428;
-		
-		
-		board[0][0].adjacents=new Slot[2];
-		board[0][0].adjacents[0]=board[0][3];
-		board[0][0].adjacents[1]=board[3][0];
-		board[0][0].mill1[0]=board[0][3];
-		board[0][0].mill1[1]=board[0][6];
-		board[0][0].mill2[0]=board[3][0];
-		board[0][0].mill2[1]=board[6][0];
-		
-		board[3][0].adjacents=new Slot[3];
-		board[3][0].adjacents[0]=board[0][0];
-		board[3][0].adjacents[1]=board[6][0];
-		board[3][0].adjacents[2]=board[3][1];
-		board[3][0].mill1[0]=board[0][0];
-		board[3][0].mill1[1]=board[6][0];
-		board[3][0].mill2[0]=board[3][1];
-		board[3][0].mill2[1]=board[3][2];
-		
-		board[6][0].adjacents=new Slot[2];
-		board[6][0].adjacents[0]=board[3][0];
-		board[6][0].adjacents[1]=board[6][3];
-		board[6][0].mill1[0]=board[0][0];
-		board[6][0].mill1[1]=board[3][0];
-		board[6][0].mill2[0]=board[6][3];
-		board[6][0].mill2[1]=board[6][6];
-		
-		board[1][1].adjacents=new Slot[2];
-		board[1][1].adjacents[0]=board[3][1];
-		board[1][1].adjacents[1]=board[1][3];
-		board[1][1].mill1[0]=board[3][1];
-		board[1][1].mill1[1]=board[5][1];
-		board[1][1].mill2[0]=board[1][3];
-		board[1][1].mill2[1]=board[1][5];
-		
-		board[3][1].adjacents=new Slot[4];
-		board[3][1].adjacents[0]=board[1][1];
-		board[3][1].adjacents[1]=board[5][1];
-		board[3][1].adjacents[2]=board[3][2];
-		board[3][1].adjacents[3]=board[3][0];
-		board[3][1].mill1[0]=board[1][1];
-		board[3][1].mill1[1]=board[5][1];
-		board[3][1].mill2[0]=board[3][2];
-		board[3][1].mill2[1]=board[3][0];
-		
-		board[5][1].adjacents=new Slot[2];
-		board[5][1].adjacents[0]=board[3][1];
-		board[5][1].adjacents[1]=board[5][3];
-		board[5][1].mill1[0]=board[3][1];
-		board[5][1].mill1[1]=board[1][1];
-		board[5][1].mill2[0]=board[5][3];
-		board[5][1].mill2[1]=board[5][5];
-		
-		board[2][2].adjacents=new Slot[2];
-		board[2][2].adjacents[0]=board[3][2];
-		board[2][2].adjacents[1]=board[2][3];
-		board[2][2].mill1[0]=board[3][2];
-		board[2][2].mill1[1]=board[4][2];
-		board[2][2].mill2[0]=board[2][3];
-		board[2][2].mill2[1]=board[2][4];
-		
-		board[3][2].adjacents=new Slot[3];
-		board[3][2].adjacents[0]=board[2][2];
-		board[3][2].adjacents[1]=board[4][2];
-		board[3][2].adjacents[2]=board[3][1];
-		board[3][2].mill1[0]=board[2][2];
-		board[3][2].mill1[1]=board[4][2];
-		board[3][2].mill2[0]=board[3][1];
-		board[3][2].mill2[1]=board[3][0];
-		
-		board[4][2].adjacents=new Slot[2];
-		board[4][2].adjacents[0]=board[3][2];
-		board[4][2].adjacents[1]=board[4][3];
-		board[4][2].mill1[0]=board[3][2];
-		board[4][2].mill1[1]=board[2][2];
-		board[4][2].mill2[0]=board[4][3];
-		board[4][2].mill2[1]=board[4][4];
-		
-		board[0][3].adjacents=new Slot[3];
-		board[0][3].adjacents[0]=board[0][0];
-		board[0][3].adjacents[1]=board[0][6];
-		board[0][3].adjacents[2]=board[1][3];
-		board[0][3].mill1[0]=board[0][0];
-		board[0][3].mill1[1]=board[0][6];
-		board[0][3].mill2[0]=board[1][3];
-		board[0][3].mill2[1]=board[2][3];
-		
-		board[1][3].adjacents=new Slot[4];
-		board[1][3].adjacents[0]=board[0][3];
-		board[1][3].adjacents[1]=board[2][3];
-		board[1][3].adjacents[2]=board[1][1];
-		board[1][3].adjacents[3]=board[1][5];
-		board[1][3].mill1[0]=board[0][3];
-		board[1][3].mill1[1]=board[2][3];
-		board[1][3].mill2[0]=board[1][1];
-		board[1][3].mill2[1]=board[1][5];
-		
-		board[2][3].adjacents=new Slot[3];
-		board[2][3].adjacents[0]=board[1][3];
-		board[2][3].adjacents[1]=board[2][2];
-		board[2][3].adjacents[2]=board[2][4];
-		board[2][3].mill1[0]=board[1][3];
-		board[2][3].mill1[1]=board[0][3];
-		board[2][3].mill2[0]=board[2][2];
-		board[2][3].mill2[1]=board[2][4];
-		
-		board[4][3].adjacents=new Slot[3];
-		board[4][3].adjacents[0]=board[4][2];
-		board[4][3].adjacents[1]=board[4][4];
-		board[4][3].adjacents[2]=board[5][3];
-		board[4][3].mill1[0]=board[4][2];
-		board[4][3].mill1[1]=board[4][4];
-		board[4][3].mill2[0]=board[5][3];
-		board[4][3].mill2[1]=board[6][3];
-		
-		board[5][3].adjacents=new Slot[4];
-		board[5][3].adjacents[0]=board[4][3];
-		board[5][3].adjacents[1]=board[6][3];
-		board[5][3].adjacents[2]=board[5][1];
-		board[5][3].adjacents[3]=board[5][5];
-		board[5][3].mill1[0]=board[4][3];
-		board[5][3].mill1[1]=board[6][3];
-		board[5][3].mill2[0]=board[5][1];
-		board[5][3].mill2[1]=board[5][5];
-		
-		board[6][3].adjacents=new Slot[3];
-		board[6][3].adjacents[0]=board[6][0];
-		board[6][3].adjacents[1]=board[6][6];
-		board[6][3].adjacents[2]=board[5][3];
-		board[6][3].mill1[0]=board[6][0];
-		board[6][3].mill1[1]=board[6][6];
-		board[6][3].mill2[0]=board[5][3];
-		board[6][3].mill2[1]=board[4][3];
-		
-		board[2][4].adjacents=new Slot[2];
-		board[2][4].adjacents[0]=board[2][3];
-		board[2][4].adjacents[1]=board[3][4];
-		board[2][4].mill1[0]=board[2][3];
-		board[2][4].mill1[1]=board[2][2];
-		board[2][4].mill2[0]=board[3][4];
-		board[2][4].mill2[1]=board[4][4];
-		
-		board[3][4].adjacents=new Slot[3];
-		board[3][4].adjacents[0]=board[2][4];
-		board[3][4].adjacents[1]=board[4][4];
-		board[3][4].adjacents[2]=board[3][5];
-		board[3][4].mill1[0]=board[2][4];
-		board[3][4].mill1[1]=board[4][4];
-		board[3][4].mill2[0]=board[3][5];
-		board[3][4].mill2[1]=board[3][6];
-		
-		board[4][4].adjacents=new Slot[2];
-		board[4][4].adjacents[0]=board[4][3];
-		board[4][4].adjacents[1]=board[3][4];
-		board[4][4].mill1[0]=board[4][3];
-		board[4][4].mill1[1]=board[4][2];
-		board[4][4].mill2[0]=board[3][4];
-		board[4][4].mill2[1]=board[2][4];
-		
-		board[1][5].adjacents=new Slot[2];
-		board[1][5].adjacents[0]=board[1][3];
-		board[1][5].adjacents[1]=board[3][5];
-		board[1][5].mill1[0]=board[1][3];
-		board[1][5].mill1[1]=board[1][1];
-		board[1][5].mill2[0]=board[3][5];
-		board[1][5].mill2[1]=board[5][5];
-		
-		board[3][5].adjacents=new Slot[4];
-		board[3][5].adjacents[0]=board[1][5];
-		board[3][5].adjacents[1]=board[5][5];
-		board[3][5].adjacents[2]=board[3][4];
-		board[3][5].adjacents[3]=board[3][6];
-		board[3][5].mill1[0]=board[1][5];
-		board[3][5].mill1[1]=board[5][5];
-		board[3][5].mill2[0]=board[3][4];
-		board[3][5].mill2[1]=board[3][6];
-		
-		board[5][5].adjacents=new Slot[2];
-		board[5][5].adjacents[0]=board[5][3];
-		board[5][5].adjacents[1]=board[3][5];
-		board[5][5].mill1[0]=board[5][3];
-		board[5][5].mill1[1]=board[5][1];
-		board[5][5].mill2[0]=board[3][5];
-		board[5][5].mill2[1]=board[1][5];
-		
-		board[0][6].adjacents=new Slot[2];
-		board[0][6].adjacents[0]=board[0][3];
-		board[0][6].adjacents[1]=board[3][6];
-		board[0][6].mill1[0]=board[0][3];
-		board[0][6].mill1[1]=board[0][0];
-		board[0][6].mill2[0]=board[3][6];
-		board[0][6].mill2[1]=board[6][6];
-		
-		board[3][6].adjacents=new Slot[3];
-		board[3][6].adjacents[0]=board[0][6];
-		board[3][6].adjacents[1]=board[6][6];
-		board[3][6].adjacents[2]=board[3][5];
-		board[3][6].mill1[0]=board[0][6];
-		board[3][6].mill1[1]=board[6][6];
-		board[3][6].mill2[0]=board[3][5];
-		board[3][6].mill2[1]=board[3][4];
-		
-		board[6][6].adjacents=new Slot[2];
-		board[6][6].adjacents[0]=board[6][3];
-		board[6][6].adjacents[1]=board[3][6];
-		board[6][6].mill1[0]=board[6][3];
-		board[6][6].mill1[1]=board[6][0];
-		board[6][6].mill2[0]=board[3][6];
-		board[6][6].mill2[1]=board[0][6];
-		
-		
+		board[6][0].setAdjacents(board[3][0], board[6][3], null, null);		
+		board[6][3].setAdjacents(board[6][0], board[6][6], board[5][3], null);	
+		board[6][6].setAdjacents(board[6][3], board[3][6], null, null);
+
+		//Gerar mills automaticamente
+		for(int i=0;i<7;i++)
+			for(int j=0;j<7;j++)
+				if(board[i][j]!=null)
+					board[i][j].generateMills();
 	}
 	
 	public void run()
@@ -803,4 +451,5 @@ public class Board {
 	{
 		
 	}
+	
 }
