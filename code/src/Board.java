@@ -69,13 +69,18 @@ public class Board
 		{
 			if(players[turn].finishedPlay)
 			{
+				winner=gameOver();
+				if(winner!=null)
+				{
+					System.out.println("O jogador das peças "+winner.color+" ganhou o jogo.");
+					break;
+				}
+				
 				players[turn].finishedPlay=false;
 				turn=change_turn(turn);
 				players[turn].play();
 				
-				winner=gameOver();
-				if(winner!=null)
-					break;
+				
 			}
 		}
 	}
@@ -86,7 +91,11 @@ public class Board
 	 */
 	public Player gameOver()
 	{
-		//TODO COMPLETA-ME!
+		
+		if(players[0].nPieces<3)
+			return players[1];
+		if(players[1].nPieces<3)
+			return players[0];
 		return null;
 	}
 	
@@ -239,6 +248,8 @@ public class Board
 					
 					players[turn].nPieces--;
 					System.out.println("peça removida turn: "+turn);
+					if(players[turn].nPieces<3)
+						madePlay=true;
 					selectedPiece.image.setBounds(1000, 1000, 1, 1);
 					selectedPiece.OnBoard.occupyingPiece=null;
 					selectedPiece.OnBoard=null;
@@ -277,6 +288,9 @@ public class Board
 					{
 						System.out.println("mill remover cor: "+turn);
 						remove_piece=true;
+					}else
+					{
+						//madePlay=true;
 					}
 					
 				}else{
