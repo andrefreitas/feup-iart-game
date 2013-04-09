@@ -19,7 +19,7 @@ public class Piece {
 		return y;
 	}
 	
-	public int getValue(){
+	public char getValue(){
 		return value;
 	}
 }
