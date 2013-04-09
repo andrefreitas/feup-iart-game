@@ -469,7 +469,7 @@ public class Board {
 				{
 					if(board.get(strAdj).piece==null)
 					{
-						//TODO continuar...
+						
 						String[] strSplit = strAdj.split("-");
 						int x=Integer.parseInt(strSplit[0]);
 						int y=Integer.parseInt(strSplit[1]);
@@ -510,7 +510,7 @@ public class Board {
 				{
 					if(board.get(strBoard).piece==null)
 					{
-						//TODO continuar...
+					
 						String[] strSplit = strBoard.split("-");
 						int x=Integer.parseInt(strSplit[0]);
 						int y=Integer.parseInt(strSplit[1]);
@@ -544,7 +544,7 @@ public class Board {
 		Vector<String> onMill=new Vector<String>();
 		Vector<String> ret=new Vector<String>();
 		
-		// TODO se mill formada retornar pessas possiveis de remover
+		
 		String pieceKey=x+"-"+y;
 		Mill mill=millsBoard.get(pieceKey);
 		if(board.get(mill.mill1.get(0)).piece!=null && board.get(mill.mill1.get(0)).piece.getValue() == turn &&
@@ -636,6 +636,17 @@ public class Board {
 	public boolean putIsValid(int x, int y){
 		String key=x+"-"+y;
 		return board.containsKey(key) && board.get(key)==null;
+	}
+
+	public int evaluate(char value) {
+		
+		if(this.gameOver()==value)
+			return 1;
+		else if(this.gameOver()!='X')
+			return -1;
+		
+		
+		return 0;
 	}
 	
 	
