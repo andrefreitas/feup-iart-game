@@ -2,8 +2,8 @@ package game;
 
 public class Piece {
 	private char value;
-	private int x;
-	private int y;
+	public int x;
+	public int y;
 	public String keyPos;
 	
 	public Piece(char value,int x, int y){

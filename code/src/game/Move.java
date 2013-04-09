@@ -1,13 +1,11 @@
 package game;
 
-import init.NineMansMorris;
-
 public class Move {
-	private int stage;
-	private char value;
-	private int[] initPos;
-	private int[] finalPos;
-	private Piece removedPiece;
+	public int stage;
+	public char value;
+	public int[] initPos;
+	public int[] finalPos;
+	public Piece removedPiece;
 	
 	
 	public Move(int st, char v, int ix, int iy, int fx, int fy, Piece p)

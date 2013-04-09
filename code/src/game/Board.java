@@ -23,7 +23,12 @@ public class Board {
 	private Vector<Piece> blackPieces = new Vector<Piece>();
 	private Vector<Piece> whitePieces = new Vector<Piece>();
 	
+	private int black;
+	private int white;
+	
 	public Board(){
+		black=9;
+		white=9;
 		initBoard();
 		initAdjacentsBoard();
 		initmillsBoard();
@@ -365,6 +370,58 @@ public class Board {
 		board.put("6-6",new Slot());
 	}
 
+	public char gameOver()
+	{
+		if(black<3)
+			return 'B';
+		if(white<3)
+			return 'P';
+		
+		return 'X';
+	}
+	
+	public void makeMove(Move m)
+	{
+		Vector<Piece> pieces=null;
+		if(m.value=='P')
+		{
+			pieces=blackPieces;
+		}else if(m.value=='B')
+		{
+			pieces=whitePieces;
+		}
+		
+		if(m.stage==0)
+		{
+			String strFinalPos = m.finalPos[0]+"-"+m.finalPos[1];
+			Piece p=new Piece(m.value,m.finalPos[0],m.finalPos[1]);
+			pieces.add(p);
+			board.get(strFinalPos).piece=p;
+			
+			if(m.removedPiece!=null)
+			{
+				board.get(m.removedPiece.keyPos).piece=null;
+				pieces.remove(m.removedPiece);
+			}
+			
+		}else
+		{
+			String strInitPos = m.initPos[0]+"-"+m.initPos[1];
+			String strFinalPos = m.finalPos[0]+"-"+m.finalPos[1];
+			Piece myP=board.get(strInitPos).piece;
+			myP.x=m.finalPos[0];
+			myP.y=m.finalPos[1];
+			board.get(strFinalPos).piece=myP;
+			board.get(strInitPos).piece=null;
+			
+			if(m.removedPiece!=null)
+			{
+				board.get(m.removedPiece.keyPos).piece=null;
+				pieces.remove(m.removedPiece);
+			}
+		}
+	}
+	
 	public Vector<Move> getPossibleMoves(char turn,int stage)
 	{
 		Vector<Move> ret = new Vector<Move>();
@@ -413,12 +470,70 @@ public class Board {
 					if(board.get(strAdj).piece==null)
 					{
 						//TODO continuar...
+						String[] strSplit = strAdj.split("-");
+						int x=Integer.parseInt(strSplit[0]);
+						int y=Integer.parseInt(strSplit[1]);
+						Vector<String> PiecesToRemove = millFormed(x,y,turn);
+						if(PiecesToRemove.size()>0)
+						{
+							// criar moves com pessas removidas
+							for(String strRemove : PiecesToRemove)
+							{
+								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,board.get(strRemove).piece);
+								ret.add(m);
+							}
+							
+						}else
+						{
+							Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,null);
+							ret.add(m);
+						}
+						
+						
 					}
 				}
 			}
 		}else if(stage==2)
 		{
-			
+			Vector<Piece> pieces=null;
+			if(turn=='P')
+			{
+				pieces=blackPieces;
+			}else if(turn=='B')
+			{
+				pieces=whitePieces;
+			}
+			for(Piece p : pieces)
+			{
+				
+				for(String strBoard : board.keySet())
+				{
+					if(board.get(strBoard).piece==null)
+					{
+						//TODO continuar...
+						String[] strSplit = strBoard.split("-");
+						int x=Integer.parseInt(strSplit[0]);
+						int y=Integer.parseInt(strSplit[1]);
+						Vector<String> PiecesToRemove = millFormed(x,y,turn);
+						if(PiecesToRemove!=null && PiecesToRemove.size()>0)
+						{
+							// criar moves com pessas removidas
+							for(String strRemove : PiecesToRemove)
+							{
+								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,board.get(strRemove).piece);
+								ret.add(m);
+							}
+							
+						}else
+						{
+							Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,null);
+							ret.add(m);
+						}
+						
+						
+					}
+				}
+			}
 		}
 		
 		return ret;
@@ -432,9 +547,39 @@ public class Board {
 		// TODO se mill formada retornar pessas possiveis de remover
 		String pieceKey=x+"-"+y;
 		Mill mill=millsBoard.get(pieceKey);
-		if(board.get(mill.mill1.get(0)).piece!=null && board.get(mill.mill1.get(0)).piece.getValue()==turn)
+		if(board.get(mill.mill1.get(0)).piece!=null && board.get(mill.mill1.get(0)).piece.getValue() == turn &&
+		   board.get(mill.mill1.get(1)).piece!=null && board.get(mill.mill1.get(1)).piece.getValue() == turn ||
+		   board.get(mill.mill2.get(0)).piece!=null && board.get(mill.mill2.get(0)).piece.getValue() == turn &&
+		   board.get(mill.mill2.get(1)).piece!=null && board.get(mill.mill2.get(1)).piece.getValue() == turn)
 		{
 			
+			Vector<Piece> pieces=null;
+			if(turn=='P')
+			{
+				pieces=whitePieces;  //peças adversarias
+			}else if(turn=='B')
+			{
+				pieces=blackPieces;  //peças adversarias
+			}
+			for(Piece p : pieces)
+			{
+				Mill millAdv=millsBoard.get(p.keyPos);
+				if(board.get(millAdv.mill1.get(0)).piece!=null && board.get(millAdv.mill1.get(0)).piece.getValue() != turn &&
+				   board.get(millAdv.mill1.get(1)).piece!=null && board.get(millAdv.mill1.get(1)).piece.getValue() != turn ||
+				   board.get(millAdv.mill2.get(0)).piece!=null && board.get(millAdv.mill2.get(0)).piece.getValue() != turn &&
+				   board.get(millAdv.mill2.get(1)).piece!=null && board.get(millAdv.mill2.get(1)).piece.getValue() != turn)
+				{
+					onMill.add(p.keyPos);
+				}else
+				{
+					ret.add(p.keyPos);
+				}
+			}
+			
+			
+		}else
+		{
+			return null;
 		}
 		
 		if(ret.size()==0)
@@ -464,10 +609,7 @@ public class Board {
 		return matrix;
 	}
 
-	public boolean putIsValid(int x, int y) {
-		String key = x + "-" + y;
-		return board.containsKey(key) && board.get(key) == null;
-	}
+	
 	
 	public Boolean putPiece(Piece p){
 		String key=p.getX()+"-"+p.getY();
@@ -489,27 +631,7 @@ public class Board {
 		return null;
 	}
 	
-	public char [][] getMatrix(){
-		char [][] matrix= new char[7][7];
-		for (int i=0; i<7; i++){
-			for(int j=0; j<7; j++){
-				String key=i+"-"+j;
-				if(board.containsKey(key)){
-					Piece p=board.get(key);
-					if(p!=null)
-						matrix[i][j]= p.getValue();
-					else
-						matrix[i][j]= 'O';
-				}
-				else {
-					matrix[i][j]='X';
-				}
-			}
-			System.out.print("\n");
-		}
-		return matrix;
-		
-	}
+	
 
 	public boolean putIsValid(int x, int y){
 		String key=x+"-"+y;
