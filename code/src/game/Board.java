@@ -489,6 +489,32 @@ public class Board {
 		return null;
 	}
 	
+	public char [][] getMatrix(){
+		char [][] matrix= new char[7][7];
+		for (int i=0; i<7; i++){
+			for(int j=0; j<7; j++){
+				String key=i+"-"+j;
+				if(board.containsKey(key)){
+					Piece p=board.get(key);
+					if(p!=null)
+						matrix[i][j]= p.getValue();
+					else
+						matrix[i][j]= 'O';
+				}
+				else {
+					matrix[i][j]='X';
+				}
+			}
+			System.out.print("\n");
+		}
+		return matrix;
+		
+	}
+
+	public boolean putIsValid(int x, int y){
+		String key=x+"-"+y;
+		return board.containsKey(key) && board.get(key)==null;
+	}
 	
 	
 }
