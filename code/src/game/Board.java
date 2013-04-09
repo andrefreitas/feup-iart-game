@@ -26,9 +26,21 @@ public class Board {
 	private int black;
 	private int white;
 	
+	private int blackMoves;
+	private int whiteMoves;
+	
+	public int blackStage;
+	public int whiteStage;
+	public char turn;
+	
 	public Board(){
 		black=9;
 		white=9;
+		blackMoves=0;
+		whiteMoves=0;
+		blackStage=0;
+		whiteStage=0;
+		turn='P';
 		initBoard();
 		initAdjacentsBoard();
 		initmillsBoard();
@@ -382,9 +394,11 @@ public class Board {
 	
 	public void makeMove(Move m)
 	{
+		Boolean blackTurn=false;
 		Vector<Piece> pieces=null;
 		if(m.value=='P')
 		{
+			blackTurn=true;
 			pieces=blackPieces;
 		}else if(m.value=='B')
 		{
@@ -398,10 +412,19 @@ public class Board {
 			pieces.add(p);
 			board.get(strFinalPos).piece=p;
 			
+			
+			
 			if(m.removedPiece!=null)
 			{
 				board.get(m.removedPiece.keyPos).piece=null;
 				pieces.remove(m.removedPiece);
+				if(m.removedPiece.getValue()=='P')
+				{
+					black--;
+				}else
+				{
+					white--;
+				}
 			}
 			
 		}else
@@ -418,13 +441,41 @@ public class Board {
 			{
 				board.get(m.removedPiece.keyPos).piece=null;
 				pieces.remove(m.removedPiece);
+				if(m.removedPiece.getValue()=='P')
+				{
+					black--;
+				}else
+				{
+					white--;
+				}
 			}
 		}
+		
+		if(blackTurn)
+		{
+			turn='B';
+			blackMoves++;
+		}else
+		{
+			turn='P';
+			whiteMoves++;
+		}
+		
+		if(blackMoves>=9 && blackStage==0)
+			blackStage=1;
+		if(whiteMoves>=9 && whiteStage==0)
+			whiteStage=1;
+		
 	}
 	
-	public Vector<Move> getPossibleMoves(char turn,int stage)
+	public Vector<Move> getPossibleMoves(char turn)
 	{
 		Vector<Move> ret = new Vector<Move>();
+		int stage;
+		if(turn=='P')
+			stage=blackStage;
+		else
+			stage=whiteStage;
 		
 		if(stage==0)
 		{
@@ -432,11 +483,12 @@ public class Board {
 			{
 				if(board.get(strBoard).piece==null)
 				{
+					
 					String[] strSplit=strBoard.split("-");
 					int x=Integer.parseInt(strSplit[0]);
 					int y=Integer.parseInt(strSplit[1]);
 					Vector<String> PiecesToRemove = millFormed(x,y,turn);
-					if(PiecesToRemove.size()>0)
+					if(PiecesToRemove!=null && PiecesToRemove.size()>0)
 					{
 						// criar moves com pessas removidas
 						for(String strRemove : PiecesToRemove)
@@ -447,6 +499,7 @@ public class Board {
 						
 					}else
 					{
+						
 						Move m=new Move(stage,turn,0,0,x,y,null);
 						ret.add(m);
 					}
@@ -603,9 +656,12 @@ public class Board {
 				else {
 					matrix[i][j] = 'X';
 				}
+				System.out.print(matrix[i][j]+" ");
 			}
+			
 			System.out.print("\n");
 		}
+		System.out.println("\n\n");
 		return matrix;
 	}
 
@@ -647,6 +703,14 @@ public class Board {
 		
 		
 		return 0;
+	}
+
+	public boolean stopMiniMax(int nMoves) {
+		
+		if(gameOver()!='X')
+			return false;
+		else 
+			return true;
 	}
 	
 	
