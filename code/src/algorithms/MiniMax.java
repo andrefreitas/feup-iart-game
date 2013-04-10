@@ -11,29 +11,41 @@ public class MiniMax {
 			v='B';
 		else 
 			v='P';
-		
+		//System.out.println("Turn: "+move.value);
 		NineMansMorris.board.makeMove(move);
-		NineMansMorris.board.getMatrix();
+		//NineMansMorris.board.getMatrix();
+		
+		
 		if(NineMansMorris.board.stopMiniMax(nMoves)){
+			//undo move
+			NineMansMorris.board.unmakeMove(move);
 			return NineMansMorris.board.evaluate(turn);
 		}else if(max){
 			Vector<Move> childmoves=NineMansMorris.board.getPossibleMoves(v);
 			for(Move movei:childmoves){
+				//System.out.println("MAX: ");
 				alpha=Math.max(alpha,play(movei,nMoves,!max,alpha,beta,turn));
 				if(beta<alpha) break;
 			}
+			//undo move
+			NineMansMorris.board.unmakeMove(move);
 			return alpha;
 		}
 		else if(!max){
 			
 			Vector<Move> childmoves=NineMansMorris.board.getPossibleMoves(v);
 			for(Move movei:childmoves){
+				//System.out.println("MIN: ");
 				beta=Math.min(alpha,play(movei,nMoves,!max,alpha,beta,turn));
 				if(beta<alpha) break;
 			}
+			//undo move
+			NineMansMorris.board.unmakeMove(move);
 			return beta;
 		}
 		
 		return 0;
 	}
+
+	
 }

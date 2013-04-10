@@ -493,7 +493,8 @@ public class Board {
 						// criar moves com pessas removidas
 						for(String strRemove : PiecesToRemove)
 						{
-							Move m=new Move(stage,turn,0,0,x,y,board.get(strRemove).piece);
+							Piece pRemove=board.get(strRemove).piece.clone();
+							Move m=new Move(stage,turn,0,0,x,y,pRemove);
 							ret.add(m);
 						}
 						
@@ -527,12 +528,13 @@ public class Board {
 						int x=Integer.parseInt(strSplit[0]);
 						int y=Integer.parseInt(strSplit[1]);
 						Vector<String> PiecesToRemove = millFormed(x,y,turn);
-						if(PiecesToRemove.size()>0)
+						if(PiecesToRemove!=null && PiecesToRemove.size()>0)
 						{
 							// criar moves com pessas removidas
 							for(String strRemove : PiecesToRemove)
 							{
-								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,board.get(strRemove).piece);
+								Piece pRemove=board.get(strRemove).piece.clone();
+								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
 							}
 							
@@ -573,7 +575,8 @@ public class Board {
 							// criar moves com pessas removidas
 							for(String strRemove : PiecesToRemove)
 							{
-								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,board.get(strRemove).piece);
+								Piece pRemove=board.get(strRemove).piece.clone();
+								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
 							}
 							
@@ -666,7 +669,7 @@ public class Board {
 	}
 
 	
-	
+	/*
 	public Boolean putPiece(Piece p){
 		String key=p.getX()+"-"+p.getY();
 		if (board.containsKey(key) && board.get(key).piece==null){
@@ -693,13 +696,23 @@ public class Board {
 		String key=x+"-"+y;
 		return board.containsKey(key) && board.get(key)==null;
 	}
-
+*/
 	public int evaluate(char value) {
 		
 		if(this.gameOver()==value)
-			return 1;
+			return 100;
 		else if(this.gameOver()!='X')
-			return -1;
+			return -100;
+		else if(this.gameOver()=='X')
+		{
+			if(value=='P')
+			{
+				return black - white;
+			}else
+			{
+				return white-black;
+			}
+		}
 		
 		
 		return 0;
@@ -707,10 +720,54 @@ public class Board {
 
 	public boolean stopMiniMax(int nMoves) {
 		
-		if(gameOver()!='X')
+		if(nMoves==3)
+			return true;
+		
+		if(gameOver()=='X')
 			return false;
 		else 
 			return true;
+	}
+
+	public void unmakeMove(Move move) {
+		
+		if(move.stage==0)
+		{
+			if(move.removedPiece!=null)
+			{
+				if(move.removedPiece.getValue()=='P')
+				{
+					blackPieces.add(move.removedPiece);
+					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					black++;
+					
+				}else
+				{
+					whitePieces.add(move.removedPiece);
+					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					white++;
+				}
+			}
+			int finalX=move.finalPos[0];
+			int finalY=move.finalPos[1];
+			Piece p=board.get(finalX+"-"+finalY).piece;
+			if(p.getValue()=='P')
+			{
+				blackPieces.remove(p);
+				blackMoves--;
+				this.turn='P';
+			}else
+			{
+				whitePieces.remove(p);
+				whiteMoves--;
+				this.turn='B';
+			}
+			board.get(finalX+"-"+finalY).piece=null;
+			
+		}else{
+			
+		}
+		
 	}
 	
 	

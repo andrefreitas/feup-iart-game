@@ -22,7 +22,7 @@ public class NineMansMorris {
 				System.out.println("Xinit: "+m.initPos[0]+", Yinit: "+m.initPos[1]
 						+"Xfinal: "+m.finalPos[0]+", Yfinal: "+m.finalPos[1]);
 			
-			System.out.println("minimax: "+MiniMax.play(m, 0,true, -10000, 10000, board.turn));
+			System.out.println("minimax: "+MiniMax.play(m, 0,false, -10000, 10000, board.turn));
 		}
 	}
 
