@@ -5,6 +5,7 @@ import java.util.Vector;
 import algorithms.MiniMax;
 import game.Board;
 import game.Move;
+import game.Piece;
 
 public class NineMansMorris {
 
@@ -12,7 +13,7 @@ public class NineMansMorris {
 	
 	public static void main(String[] args) {
 		board=new Board();
-		test1(8);
+		test1(40);
 	}
 	
 	public static void test1(int jogadas)
@@ -41,12 +42,32 @@ public class NineMansMorris {
 				//System.out.println("minimax: "+minimaxVal);
 			}
 			if(nextMove==null)
-				System.out.println("Sem jogadas possiveis...");
-			else
+			{
+				System.out.println("Sem jogadas possiveis...size: "+moves.size());
+				System.out.println("blackPieces");
+				for(Piece pTeste: board.blackPieces)
+				{
+					System.out.println("key: "+pTeste.keyPos);
+					System.out.println("x: "+pTeste.x);
+					System.out.println("y: "+pTeste.y);
+					System.out.println("value: "+pTeste.getValue());
+					System.out.println("\n");
+				}
+				System.out.println("whitePieces");
+				for(Piece pTeste: board.whitePieces)
+				{
+					System.out.println("key: "+pTeste.keyPos);
+					System.out.println("x: "+pTeste.x);
+					System.out.println("y: "+pTeste.y);
+					System.out.println("value: "+pTeste.getValue());
+					System.out.println("\n");
+				}
+			}else
 				board.makeMove(nextMove);
-			System.out.println("Jogada - "+nextMove.value+" valor: "+moveVal+" board.turn: "+board.turn);
-			board.getMatrix();
 			i++;
+			System.out.println("Jogada "+i+"- "+nextMove.value+" valor: "+moveVal+" board.turn: "+board.turn);
+			board.getMatrix();
+			
 		}
 	}
 
