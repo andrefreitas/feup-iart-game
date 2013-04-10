@@ -396,13 +396,16 @@ public class Board {
 	{
 		Boolean blackTurn=false;
 		Vector<Piece> pieces=null;
+		Vector<Piece> piecesRemove=null;
 		if(m.value=='P')
 		{
 			blackTurn=true;
 			pieces=blackPieces;
+			piecesRemove=whitePieces;
 		}else if(m.value=='B')
 		{
 			pieces=whitePieces;
+			piecesRemove=blackPieces;
 		}
 		
 		if(m.stage==0)
@@ -417,7 +420,16 @@ public class Board {
 			if(m.removedPiece!=null)
 			{
 				board.get(m.removedPiece.keyPos).piece=null;
-				pieces.remove(m.removedPiece);
+				int idx=0;
+				for(Piece pR : piecesRemove)
+				{
+					if(pR.keyPos.startsWith(m.removedPiece.keyPos))
+					{
+						break;
+					}
+					idx++;
+				}
+				piecesRemove.remove(idx);
 				if(m.removedPiece.getValue()=='P')
 				{
 					black--;
@@ -440,7 +452,17 @@ public class Board {
 			if(m.removedPiece!=null)
 			{
 				board.get(m.removedPiece.keyPos).piece=null;
-				pieces.remove(m.removedPiece);
+				//pieces.remove(m.removedPiece);
+				int idx=0;
+				for(Piece pR : piecesRemove)
+				{
+					if(pR.keyPos.startsWith(m.removedPiece.keyPos))
+					{
+						break;
+					}
+					idx++;
+				}
+				piecesRemove.remove(idx);
 				if(m.removedPiece.getValue()=='P')
 				{
 					black--;
@@ -493,6 +515,29 @@ public class Board {
 						// criar moves com pessas removidas
 						for(String strRemove : PiecesToRemove)
 						{
+							if(board.get(strRemove).piece==null)
+							{
+								System.out.println("Piece "+strRemove+" não existe em board!!");
+								
+								System.out.println("blackPieces");
+								for(Piece pTeste: blackPieces)
+								{
+									System.out.println("key: "+pTeste.keyPos);
+									System.out.println("x: "+pTeste.x);
+									System.out.println("y: "+pTeste.y);
+									System.out.println("value: "+pTeste.getValue());
+									System.out.println("\n");
+								}
+								System.out.println("whitePieces");
+								for(Piece pTeste: whitePieces)
+								{
+									System.out.println("key: "+pTeste.keyPos);
+									System.out.println("x: "+pTeste.x);
+									System.out.println("y: "+pTeste.y);
+									System.out.println("value: "+pTeste.getValue());
+									System.out.println("\n");
+								}
+							}
 							Piece pRemove=board.get(strRemove).piece.clone();
 							Move m=new Move(stage,turn,0,0,x,y,pRemove);
 							ret.add(m);
@@ -720,7 +765,7 @@ public class Board {
 
 	public boolean stopMiniMax(int nMoves) {
 		
-		if(nMoves==3)
+		if(nMoves>4)
 			return true;
 		
 		if(gameOver()=='X')
