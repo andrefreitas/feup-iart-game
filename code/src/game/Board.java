@@ -23,8 +23,11 @@ public class Board {
 	public Vector<Piece> blackPieces = new Vector<Piece>();
 	public Vector<Piece> whitePieces = new Vector<Piece>();
 	
-	private int black;
-	private int white;
+	public HashSet<String> playedMoves = new HashSet<String>();
+	public Move lastMove=null;
+	
+	public int black;
+	public int white;
 	
 	private int blackMoves;
 	private int whiteMoves;
@@ -558,6 +561,8 @@ public class Board {
 			blackStage=2;
 		if(white<=3)
 			whiteStage=2;
+		
+		lastMove=m;
 	}
 	
 	public Vector<Move> getPossibleMoves(char turn)
@@ -829,6 +834,10 @@ public class Board {
 			return -100;
 		else if(this.gameOver()=='X')
 		{
+			if(playedMoves.contains(lastMove.getHashKey()))
+			{
+				return -10;
+			}else
 			if(value=='P')
 			{
 				return black - white;

@@ -29,10 +29,14 @@ public class Move {
 		removedPiece=p;
 	}
 	
-	public Boolean valid()
-	{
-		
-		
-		return true;
+	
+
+	public String getHashKey() {
+		String ret=""+stage+value+finalPos[0]+finalPos[1];
+		if(initPos!=null)
+			ret+=""+initPos[0]+initPos[1];
+		if(removedPiece!=null)
+			ret+=""+removedPiece.keyPos+removedPiece.getValue();
+		return ret;
 	}
 }

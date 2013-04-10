@@ -13,7 +13,7 @@ public class NineMansMorris {
 	
 	public static void main(String[] args) {
 		board=new Board();
-		test1(40);
+		test1(100);
 	}
 	
 	public static void test1(int jogadas)
@@ -62,10 +62,24 @@ public class NineMansMorris {
 					System.out.println("value: "+pTeste.getValue());
 					System.out.println("\n");
 				}
-			}else
+			}else{
 				board.makeMove(nextMove);
+				board.playedMoves.add(nextMove.getHashKey());
+			}
 			i++;
-			System.out.println("Jogada "+i+"- "+nextMove.value+" valor: "+moveVal+" board.turn: "+board.turn);
+			System.out.println("Jogada "+i+" - "+nextMove.value+" valor: "+moveVal+" next turn: "+board.turn);
+			if(nextMove.stage==0)
+			{
+				System.out.println("Stage 0 pos: "+nextMove.finalPos[0]+"-"+nextMove.finalPos[1]);
+			}else 
+			{
+				System.out.println("Stage "+nextMove.stage+" init: "+nextMove.initPos[0]+"-"+nextMove.initPos[1]+", final: "+nextMove.finalPos[0]+"-"+nextMove.finalPos[1]);
+			}
+			if(nextMove.removedPiece!=null)
+			{
+				System.out.println("Peça removida: "+nextMove.removedPiece.keyPos+" - "+nextMove.removedPiece.getValue());
+			}
+			System.out.println("Peças pretas: "+board.black+", peças brancas: "+board.white);
 			board.getMatrix();
 			
 		}
