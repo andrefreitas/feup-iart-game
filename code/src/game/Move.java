@@ -1,11 +1,11 @@
 package game;
 
 public class Move {
-	public int stage;
-	public char value;
-	public int[] initPos;
-	public int[] finalPos;
-	public Piece removedPiece;
+	public final int stage;
+	public final char value;
+	public final int[] initPos;
+	public final int[] finalPos;
+	public final Piece removedPiece;
 	
 	
 	public Move(int st, char v, int ix, int iy, int fx, int fy, Piece p)
@@ -27,6 +27,16 @@ public class Move {
 		finalPos[1]=fy;
 		
 		removedPiece=p;
+	}
+	
+	public void showMove()
+	{
+		System.out.println("ShowMove - stage: "+stage+" value: "+value);
+		if(stage!=0)
+			System.out.println("Initpos: "+initPos[0]+"-"+initPos[1]);
+		System.out.println("FinalPos: "+finalPos[0]+"-"+finalPos[1]);
+		if(removedPiece!=null)
+			System.out.println("Removed Piece: "+removedPiece.keyPos+" value: "+removedPiece.getValue());
 	}
 	
 	

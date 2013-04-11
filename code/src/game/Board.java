@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 
-import complexity.Profiling;
+//import complexity.Profiling;
 
 class Adjacent{
 	public Vector<String> adj=new Vector<String>();
@@ -401,6 +401,11 @@ public class Board {
 	
 	public void makeMove(Move m)
 	{
+		/*if(NineMansMorris.i>=27)
+		{
+			System.out.println("MakeMove start");
+			getMatrix();
+		}*/
 		Boolean blackTurn=false;
 		Vector<Piece> pieces=null;
 		Vector<Piece> piecesRemove=null;
@@ -571,6 +576,12 @@ public class Board {
 			whiteStage=2;
 		
 		lastMove=m;
+		/*if(NineMansMorris.i>=27)
+		{
+			System.out.println("MakeMove");
+			m.showMove();
+			getMatrix();
+		}*/
 	}
 	
 	public Vector<Move> getPossibleMoves(char turn)
@@ -588,7 +599,7 @@ public class Board {
 		}else{
 			stage=whiteStage;
 		}
-		Profiling prof=new Profiling(stage,black+white);
+		//Profiling prof=new Profiling(stage,black+white);
 		if(stage==0)
 		{
 			
@@ -632,7 +643,7 @@ public class Board {
 							Piece pRemove=board.get(strRemove).piece.clone();
 							Move m=new Move(stage,turn,0,0,x,y,pRemove);
 							ret.add(m);
-							prof.inc();
+						//	prof.inc();
 						}
 						
 					}else
@@ -642,7 +653,7 @@ public class Board {
 						ret.add(m);
 					}
 				}
-				prof.inc();
+				//prof.inc();
 			}
 		}else if(stage==1)
 		{
@@ -674,7 +685,7 @@ public class Board {
 								Piece pRemove=board.get(strRemove).piece.clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
-								prof.inc();
+								//prof.inc();
 							}
 							
 						}else
@@ -685,9 +696,9 @@ public class Board {
 						
 						
 					}
-					prof.inc();
+					//prof.inc();
 				}
-				prof.inc();
+				//prof.inc();
 			}
 		}else if(stage==2)
 		{
@@ -719,7 +730,7 @@ public class Board {
 								Piece pRemove=board.get(strRemove).piece.clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
-								prof.inc();
+								//prof.inc();
 							}
 							
 						}else
@@ -730,20 +741,23 @@ public class Board {
 						
 						
 					}
-					prof.inc();
+					//prof.inc();
 				}
-				prof.inc();
+				//prof.inc();
 			}
 			//System.out.println("Stage 2, jogadas possiveis: "+ret.size());
 		}
 		//prof.finishProfiling();
-		if(false && white<4)
-		for(Move tMove: ret)
+		
+		/*for(Move tMove: ret)
 		{
-			if(tMove.removedPiece!=null && tMove.removedPiece.x==2 && tMove.value=='P' &&
-					tMove.removedPiece.y==4 && tMove.removedPiece.getValue()=='B' )
+			if(tMove.removedPiece!=null && (board.get(tMove.removedPiece.keyPos).piece==null || 
+					board.get(tMove.removedPiece.keyPos).piece!=null && 
+					board.get(tMove.removedPiece.keyPos).piece.getValue()!=tMove.removedPiece.getValue()))
 			{
-				System.out.println("ERRO nabiço..turn board: "+this.turn);
+				System.out.println("ERRO remover peça inexistente turn: "+this.turn);
+				System.out.println("move: "+tMove.stage+" "+tMove.value+" "+tMove.initPos[0]+"-"+tMove.initPos[1]+
+						" "+tMove.finalPos[0]+"-"+tMove.finalPos[1]+" remove: "+tMove.removedPiece.keyPos+" "+tMove.removedPiece.getValue());
 				System.out.println("blackPieces");
 				for(Piece pTeste: blackPieces)
 				{
@@ -762,9 +776,9 @@ public class Board {
 					System.out.println("value: "+pTeste.getValue());
 					System.out.println("\n");
 				}
-				break;
+				
 			}
-		}
+		}*/
 		
 		return ret;
 	}
@@ -893,7 +907,7 @@ public class Board {
 		{
 			if(playedMoves.contains(lastMove.getHashKey()))
 			{
-				ret= -10;
+				ret= -50;
 			}else
 			if(value=='P')
 			{
@@ -907,7 +921,14 @@ public class Board {
 		{
 			for(Piece p : blackPieces)
 			{
-				for(String s:this.adjacentsBoard.get(p.keyPos).adj)
+				for(String s:this.millsBoard.get(p.keyPos).mill1)
+				{
+					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
+					{
+						ret++;
+					}
+				}
+				for(String s:this.millsBoard.get(p.keyPos).mill2)
 				{
 					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
 					{
@@ -934,7 +955,7 @@ public class Board {
 
 	public boolean stopMiniMax(int nMoves) {
 		
-		if(nMoves>1)
+		if(nMoves>3)
 			return true;
 		
 		if(gameOver()=='X')
@@ -944,21 +965,26 @@ public class Board {
 	}
 
 	public void unmakeMove(Move move) {
-		
+		/*if(NineMansMorris.i>=27)
+			System.out.println("UnmakeMove start");
+		*/
 		if(move.stage==0)
 		{
 			if(move.removedPiece!=null)
 			{
 				if(move.removedPiece.getValue()=='P')
 				{
-					blackPieces.add(move.removedPiece);
-					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					Piece poux=move.removedPiece.clone();
+					blackPieces.add(poux);
+					board.get(move.removedPiece.keyPos).piece=poux;
 					black++;
+					
 					
 				}else
 				{
-					whitePieces.add(move.removedPiece);
-					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					Piece poux=move.removedPiece.clone();
+					whitePieces.add(poux);
+					board.get(move.removedPiece.keyPos).piece=poux;
 					white++;
 				}
 			}
@@ -1001,14 +1027,16 @@ public class Board {
 			{
 				if(move.removedPiece.getValue()=='P')
 				{
-					blackPieces.add(move.removedPiece);
-					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					Piece poux=move.removedPiece.clone();
+					blackPieces.add(poux);
+					board.get(move.removedPiece.keyPos).piece=poux;
 					black++;
 					
 				}else
 				{
-					whitePieces.add(move.removedPiece);
-					board.get(move.removedPiece.keyPos).piece=move.removedPiece;
+					Piece poux=move.removedPiece.clone();
+					whitePieces.add(poux);
+					board.get(move.removedPiece.keyPos).piece=poux;
 					white++;
 				}
 			}
@@ -1039,7 +1067,23 @@ public class Board {
 		}else{
 			whiteStage=move.stage;
 		}
+		if(black<=3)
+			blackStage=2;
+		else if(blackMoves>=9)
+			blackStage=1;
+		else blackStage=0;
 		
+		if(white<=3)
+			whiteStage=2;
+		else if(whiteMoves>=9)
+			whiteStage=1;
+		else whiteStage=0;
+		/*if(NineMansMorris.i>=27)
+		{
+			System.out.println("UnmakeMove");
+			move.showMove();
+			getMatrix();
+		}*/
 	}
 	
 	

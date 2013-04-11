@@ -2,7 +2,7 @@ package init;
 
 import java.util.Vector;
 
-import complexity.Profiling;
+//import complexity.Profiling;
 
 import algorithms.MiniMax;
 import game.Board;
@@ -28,6 +28,18 @@ public class NineMansMorris {
 			Vector<Move> moves=board.getPossibleMoves(board.turn);
 			if(moves.size()==0)
 				break;
+			
+			/*if(i>=50)
+			{
+				System.out.println("moves ninemasnmorris...");
+				board.getMatrix();
+				for(Move m : moves)
+				{
+					m.showMove();
+				}
+			}*/
+			
+			
 			//Profiling.self.finishProfiling();
 			Move nextMove=null;
 			int moveVal=-10000;
@@ -40,21 +52,7 @@ public class NineMansMorris {
 					System.out.println("Xinit: "+m.initPos[0]+", Yinit: "+m.initPos[1]
 							+"Xfinal: "+m.finalPos[0]+", Yfinal: "+m.finalPos[1]);
 				*/
-				if(false && board.white<4)
-				{
-					System.out.println("move debugg");
-					System.out.println(m.stage);
-					System.out.println(m.value);
-					System.out.println(m.initPos[0]+"-"+m.initPos[1]);
-					System.out.println(m.finalPos[0]+"-"+m.finalPos[1]);
-					if(m.removedPiece!=null)
-					{
-						System.out.println("remove: "+m.removedPiece.keyPos);
-						System.out.println(m.removedPiece.x);
-						System.out.println(m.removedPiece.y);
-						System.out.println(m.removedPiece.getValue());
-					}
-				}
+				
 					
 				int minimaxVal=MiniMax.play(m, 0,false, -10000, 10000, board.turn);
 				if(minimaxVal>moveVal)
@@ -86,6 +84,10 @@ public class NineMansMorris {
 					System.out.println("\n");
 				}
 			}else{
+				/*if(i>=27){
+					System.out.println("NineMansMorris move:");
+					nextMove.showMove();
+				}*/
 				board.makeMove(nextMove);
 				board.playedMoves.add(nextMove.getHashKey());
 			}
@@ -104,8 +106,27 @@ public class NineMansMorris {
 			}
 			System.out.println("Peças pretas: "+board.black+", peças brancas: "+board.white);
 			board.getMatrix();
+			/*System.out.println("blackPieces");
+			for(Piece pTeste: board.blackPieces)
+			{
+				System.out.println("key: "+pTeste.keyPos);
+				System.out.println("x: "+pTeste.x);
+				System.out.println("y: "+pTeste.y);
+				System.out.println("value: "+pTeste.getValue());
+				System.out.println("\n");
+			}
+			System.out.println("whitePieces");
+			for(Piece pTeste: board.whitePieces)
+			{
+				System.out.println("key: "+pTeste.keyPos);
+				System.out.println("x: "+pTeste.x);
+				System.out.println("y: "+pTeste.y);
+				System.out.println("value: "+pTeste.getValue());
+				System.out.println("\n");
+			}*/
 			
 		}
+		System.out.println("Vitoria: "+board.gameOver());
 	}
 
 }
