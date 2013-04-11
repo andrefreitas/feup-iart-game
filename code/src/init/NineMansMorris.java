@@ -2,6 +2,8 @@ package init;
 
 import java.util.Vector;
 
+import complexity.Profiling;
+
 import algorithms.MiniMax;
 import game.Board;
 import game.Move;
@@ -9,19 +11,24 @@ import game.Piece;
 
 public class NineMansMorris {
 
+	public static int i;
 	public static Board board;
 	
 	public static void main(String[] args) {
 		board=new Board();
-		test1(100);
+		test1(200);
 	}
 	
 	public static void test1(int jogadas)
 	{
-		int i=0;
+		i=0;
+		
 		while(i<jogadas && board.gameOver()=='X')
 		{
 			Vector<Move> moves=board.getPossibleMoves(board.turn);
+			if(moves.size()==0)
+				break;
+			//Profiling.self.finishProfiling();
 			Move nextMove=null;
 			int moveVal=-10000;
 			for(Move m : moves)
@@ -33,6 +40,22 @@ public class NineMansMorris {
 					System.out.println("Xinit: "+m.initPos[0]+", Yinit: "+m.initPos[1]
 							+"Xfinal: "+m.finalPos[0]+", Yfinal: "+m.finalPos[1]);
 				*/
+				if(false && board.white<4)
+				{
+					System.out.println("move debugg");
+					System.out.println(m.stage);
+					System.out.println(m.value);
+					System.out.println(m.initPos[0]+"-"+m.initPos[1]);
+					System.out.println(m.finalPos[0]+"-"+m.finalPos[1]);
+					if(m.removedPiece!=null)
+					{
+						System.out.println("remove: "+m.removedPiece.keyPos);
+						System.out.println(m.removedPiece.x);
+						System.out.println(m.removedPiece.y);
+						System.out.println(m.removedPiece.getValue());
+					}
+				}
+					
 				int minimaxVal=MiniMax.play(m, 0,false, -10000, 10000, board.turn);
 				if(minimaxVal>moveVal)
 				{

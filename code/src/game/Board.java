@@ -1,8 +1,12 @@
 package game;
 
+import init.NineMansMorris;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+
+import complexity.Profiling;
 
 class Adjacent{
 	public Vector<String> adj=new Vector<String>();
@@ -512,6 +516,9 @@ public class Board {
 				if(idx>=piecesRemove.size())
 				{
 					System.out.println("tentativa de remover: "+m.removedPiece.keyPos+" "+m.removedPiece.getValue()+" falhada...");
+					System.out.println(""+m.removedPiece.x+" - "+m.removedPiece.y);
+					System.out.println(""+m.stage+" "+m.value+" "+m.initPos[0]+" "+m.initPos[1]+" "+
+										m.finalPos[0]+" "+m.finalPos[1]);
 					System.out.println("blackPieces");
 					for(Piece pTeste: blackPieces)
 					{
@@ -530,6 +537,7 @@ public class Board {
 						System.out.println("value: "+pTeste.getValue());
 						System.out.println("\n");
 					}
+					this.getMatrix();
 				}
 				piecesRemove.remove(idx);
 				if(m.removedPiece.getValue()=='P')
@@ -567,15 +575,23 @@ public class Board {
 	
 	public Vector<Move> getPossibleMoves(char turn)
 	{
+		
 		Vector<Move> ret = new Vector<Move>();
+		
+		if(white<3 || black<3)
+			return ret;
+		
 		int stage;
 		if(turn=='P')
+		{
 			stage=blackStage;
-		else
+		}else{
 			stage=whiteStage;
-		
+		}
+		Profiling prof=new Profiling(stage,black+white);
 		if(stage==0)
 		{
+			
 			for(String strBoard : board.keySet())
 			{
 				if(board.get(strBoard).piece==null)
@@ -616,6 +632,7 @@ public class Board {
 							Piece pRemove=board.get(strRemove).piece.clone();
 							Move m=new Move(stage,turn,0,0,x,y,pRemove);
 							ret.add(m);
+							prof.inc();
 						}
 						
 					}else
@@ -625,6 +642,7 @@ public class Board {
 						ret.add(m);
 					}
 				}
+				prof.inc();
 			}
 		}else if(stage==1)
 		{
@@ -656,6 +674,7 @@ public class Board {
 								Piece pRemove=board.get(strRemove).piece.clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
+								prof.inc();
 							}
 							
 						}else
@@ -666,7 +685,9 @@ public class Board {
 						
 						
 					}
+					prof.inc();
 				}
+				prof.inc();
 			}
 		}else if(stage==2)
 		{
@@ -698,6 +719,7 @@ public class Board {
 								Piece pRemove=board.get(strRemove).piece.clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
+								prof.inc();
 							}
 							
 						}else
@@ -708,9 +730,40 @@ public class Board {
 						
 						
 					}
+					prof.inc();
 				}
+				prof.inc();
 			}
 			//System.out.println("Stage 2, jogadas possiveis: "+ret.size());
+		}
+		//prof.finishProfiling();
+		if(false && white<4)
+		for(Move tMove: ret)
+		{
+			if(tMove.removedPiece!=null && tMove.removedPiece.x==2 && tMove.value=='P' &&
+					tMove.removedPiece.y==4 && tMove.removedPiece.getValue()=='B' )
+			{
+				System.out.println("ERRO nabiço..turn board: "+this.turn);
+				System.out.println("blackPieces");
+				for(Piece pTeste: blackPieces)
+				{
+					System.out.println("key: "+pTeste.keyPos);
+					System.out.println("x: "+pTeste.x);
+					System.out.println("y: "+pTeste.y);
+					System.out.println("value: "+pTeste.getValue());
+					System.out.println("\n");
+				}
+				System.out.println("whitePieces");
+				for(Piece pTeste: whitePieces)
+				{
+					System.out.println("key: "+pTeste.keyPos);
+					System.out.println("x: "+pTeste.x);
+					System.out.println("y: "+pTeste.y);
+					System.out.println("value: "+pTeste.getValue());
+					System.out.println("\n");
+				}
+				break;
+			}
 		}
 		
 		return ret;
@@ -769,6 +822,7 @@ public class Board {
 		{
 			return null;
 		}
+		
 		
 		if(ret.size()==0)
 			return onMill;
@@ -830,33 +884,57 @@ public class Board {
 	}
 */
 	public int evaluate(char value) {
-		
+		int ret=0;
 		if(this.gameOver()==value)
-			return 100;
+			ret= 100;
 		else if(this.gameOver()!='X')
-			return -100;
+			ret= -100;
 		else if(this.gameOver()=='X')
 		{
 			if(playedMoves.contains(lastMove.getHashKey()))
 			{
-				return -10;
+				ret= -10;
 			}else
 			if(value=='P')
 			{
-				return black - white;
+				ret= black - white;
 			}else
 			{
-				return white-black;
+				ret= white-black;
+			}
+		}
+		if(value=='P')
+		{
+			for(Piece p : blackPieces)
+			{
+				for(String s:this.adjacentsBoard.get(p.keyPos).adj)
+				{
+					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
+					{
+						ret++;
+					}
+				}
+			}
+		}else
+		{
+			for(Piece p : whitePieces)
+			{
+				for(String s:this.adjacentsBoard.get(p.keyPos).adj)
+				{
+					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
+					{
+						ret++;
+					}
+				}
 			}
 		}
 		
-		
-		return 0;
+		return ret;
 	}
 
 	public boolean stopMiniMax(int nMoves) {
 		
-		if(nMoves>4)
+		if(nMoves>1)
 			return true;
 		
 		if(gameOver()=='X')
