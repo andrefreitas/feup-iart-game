@@ -748,16 +748,19 @@ public class Board {
 			}
 			for(Piece p : pieces)
 			{
-				Mill millAdv=millsBoard.get(p.keyPos);
-				if(board.get(millAdv.mill1.get(0)).piece!=null && board.get(millAdv.mill1.get(0)).piece.getValue() != turn &&
-				   board.get(millAdv.mill1.get(1)).piece!=null && board.get(millAdv.mill1.get(1)).piece.getValue() != turn ||
-				   board.get(millAdv.mill2.get(0)).piece!=null && board.get(millAdv.mill2.get(0)).piece.getValue() != turn &&
-				   board.get(millAdv.mill2.get(1)).piece!=null && board.get(millAdv.mill2.get(1)).piece.getValue() != turn)
+				if(board.get(p.keyPos).piece!=null)
 				{
-					onMill.add(p.keyPos);
-				}else
-				{
-					ret.add(p.keyPos);
+					Mill millAdv=millsBoard.get(p.keyPos);
+					if(board.get(millAdv.mill1.get(0)).piece!=null && board.get(millAdv.mill1.get(0)).piece.getValue() != turn &&
+					   board.get(millAdv.mill1.get(1)).piece!=null && board.get(millAdv.mill1.get(1)).piece.getValue() != turn ||
+					   board.get(millAdv.mill2.get(0)).piece!=null && board.get(millAdv.mill2.get(0)).piece.getValue() != turn &&
+					   board.get(millAdv.mill2.get(1)).piece!=null && board.get(millAdv.mill2.get(1)).piece.getValue() != turn)
+					{
+						onMill.add(p.keyPos);
+					}else
+					{
+						ret.add(p.keyPos);
+					}
 				}
 			}
 			
