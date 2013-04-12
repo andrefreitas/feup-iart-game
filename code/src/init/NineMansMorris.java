@@ -1,5 +1,10 @@
 package init;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.Vector;
 
 //import complexity.Profiling;
@@ -16,116 +21,130 @@ public class NineMansMorris {
 	
 	public static void main(String[] args) {
 		board=new Board();
-		test1(200);
+		Date d1=new Date();
+		long t1=d1.getTime();
+		
+		
+		//test1(500);
+		test2();
+		
+		d1=new Date();
+		long t2=d1.getTime();
+		System.out.println("Tempo: "+(t2-t1));
 	}
 	
+	private static void test2() {
+		
+		char winner='X';
+		Move nextMove=null;
+		while(board.gameOver()=='X')
+		{
+			Vector<Move> moves=board.getPossibleMoves(board.turn);
+			if(moves.size()==0)
+			{
+				if(board.turn=='P')
+				{
+					winner='B';
+				}else
+				{
+					winner='P';
+				}
+				
+				break;
+			}
+			
+			if(board.turn=='B')
+			{
+				//board.getMatrix();
+				int i=0;
+				for(Move m : moves)
+				{
+					System.out.println("id: "+i);
+					m.showMove();
+					i++;
+				}
+				System.out.println("Id: ");
+				
+				String sread=null;
+				
+				try {
+					BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+					sread=in.readLine();
+				} catch (Exception e) {
+					
+					e.printStackTrace();
+				}
+				nextMove=moves.get(Integer.parseInt(sread));
+			}else
+			{
+				nextMove=null;
+				int moveVal=-10000;
+				for(Move m : moves)
+				{
+					
+					int minimaxVal=MiniMax.play(m, 0,false, moveVal, 10000, board.turn);
+					if(minimaxVal>moveVal)
+					{
+						moveVal=minimaxVal;
+						nextMove=m;
+					}
+					
+				}
+			}
+			board.makeMove(nextMove);
+			board.playedMoves.add(nextMove.getHashKey());
+			System.out.println("Played: ");
+			nextMove.showMove();
+			board.getMatrix();
+		}
+		if(winner!='X')
+			System.out.println("Sem jogadas possiveis, vitoria: "+winner);
+		else
+			System.out.println("Vitoria: "+board.gameOver());
+	}
+
 	public static void test1(int jogadas)
 	{
 		i=0;
-		
+		Move nextMove=null;
 		while(i<jogadas && board.gameOver()=='X')
 		{
 			Vector<Move> moves=board.getPossibleMoves(board.turn);
 			if(moves.size()==0)
 				break;
 			
-			/*if(i>=50)
-			{
-				System.out.println("moves ninemasnmorris...");
-				board.getMatrix();
-				for(Move m : moves)
-				{
-					m.showMove();
-				}
-			}*/
 			
-			
-			//Profiling.self.finishProfiling();
-			Move nextMove=null;
+			nextMove=null;
 			int moveVal=-10000;
 			for(Move m : moves)
 			{
-				/*
-				if(m.stage==0)
-					System.out.println("Xfinal: "+m.finalPos[0]+", Yfinal: "+m.finalPos[1]);
-				else
-					System.out.println("Xinit: "+m.initPos[0]+", Yinit: "+m.initPos[1]
-							+"Xfinal: "+m.finalPos[0]+", Yfinal: "+m.finalPos[1]);
-				*/
 				
-					
-				int minimaxVal=MiniMax.play(m, 0,false, -10000, 10000, board.turn);
+				int minimaxVal=MiniMax.play(m, 0,false, moveVal, 10000, board.turn);
 				if(minimaxVal>moveVal)
 				{
 					moveVal=minimaxVal;
 					nextMove=m;
 				}
-				//System.out.println("minimax: "+minimaxVal);
+				
 			}
 			if(nextMove==null)
 			{
 				System.out.println("Sem jogadas possiveis...size: "+moves.size());
-				System.out.println("blackPieces");
-				for(Piece pTeste: board.blackPieces)
-				{
-					System.out.println("key: "+pTeste.keyPos);
-					System.out.println("x: "+pTeste.x);
-					System.out.println("y: "+pTeste.y);
-					System.out.println("value: "+pTeste.getValue());
-					System.out.println("\n");
-				}
-				System.out.println("whitePieces");
-				for(Piece pTeste: board.whitePieces)
-				{
-					System.out.println("key: "+pTeste.keyPos);
-					System.out.println("x: "+pTeste.x);
-					System.out.println("y: "+pTeste.y);
-					System.out.println("value: "+pTeste.getValue());
-					System.out.println("\n");
-				}
+				
 			}else{
-				/*if(i>=27){
-					System.out.println("NineMansMorris move:");
-					nextMove.showMove();
-				}*/
+				
 				board.makeMove(nextMove);
 				board.playedMoves.add(nextMove.getHashKey());
 			}
 			i++;
-			System.out.println("Jogada "+i+" - "+nextMove.value+" valor: "+moveVal+" next turn: "+board.turn);
-			if(nextMove.stage==0)
-			{
-				System.out.println("Stage 0 pos: "+nextMove.finalPos[0]+"-"+nextMove.finalPos[1]);
-			}else 
-			{
-				System.out.println("Stage "+nextMove.stage+" init: "+nextMove.initPos[0]+"-"+nextMove.initPos[1]+", final: "+nextMove.finalPos[0]+"-"+nextMove.finalPos[1]);
-			}
-			if(nextMove.removedPiece!=null)
-			{
-				System.out.println("Peça removida: "+nextMove.removedPiece.keyPos+" - "+nextMove.removedPiece.getValue());
-			}
-			System.out.println("Peças pretas: "+board.black+", peças brancas: "+board.white);
-			board.getMatrix();
-			/*System.out.println("blackPieces");
-			for(Piece pTeste: board.blackPieces)
-			{
-				System.out.println("key: "+pTeste.keyPos);
-				System.out.println("x: "+pTeste.x);
-				System.out.println("y: "+pTeste.y);
-				System.out.println("value: "+pTeste.getValue());
-				System.out.println("\n");
-			}
-			System.out.println("whitePieces");
-			for(Piece pTeste: board.whitePieces)
-			{
-				System.out.println("key: "+pTeste.keyPos);
-				System.out.println("x: "+pTeste.x);
-				System.out.println("y: "+pTeste.y);
-				System.out.println("value: "+pTeste.getValue());
-				System.out.println("\n");
-			}*/
+			
+			
 			
 		}
+		System.out.println("Jogada "+i);
+		
+		System.out.println("Peças pretas: "+board.black+", peças brancas: "+board.white);
+		board.getMatrix();
 		System.out.println("Vitoria: "+board.gameOver());
 	}
 

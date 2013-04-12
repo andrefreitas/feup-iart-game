@@ -276,9 +276,9 @@ public class Board {
 		
 		Adjacent a9=new Adjacent();
 		a9.adj.add("1-1");
-		a9.adj.add("3-0");
-		a9.adj.add("3-2");
-		a9.adj.add("5-1");
+		a9.adj.add("1-5");
+		a9.adj.add("0-3");
+		a9.adj.add("2-3");
 		adjacentsBoard.put("1-3",a9);
 		
 		Adjacent a10=new Adjacent();
@@ -900,56 +900,84 @@ public class Board {
 	public int evaluate(char value) {
 		int ret=0;
 		if(this.gameOver()==value)
-			ret= 100;
+			ret= 1000;
 		else if(this.gameOver()!='X')
-			ret= -100;
+			ret= -1000;
 		else if(this.gameOver()=='X')
 		{
-			if(playedMoves.contains(lastMove.getHashKey()))
+			if(false && playedMoves.contains(lastMove.getHashKey()))
 			{
-				ret= -50;
+				if(lastMove.value==value)
+				{
+					ret= -50;
+				}else
+				{
+					ret= 50;
+				}
+				
 			}else
 			if(value=='P')
 			{
 				ret= black - white;
+				ret*=2;
 			}else
 			{
 				ret= white-black;
+				ret*=2;
 			}
 		}
-		if(value=='P')
+		if(ret<-999 || ret>999)
+			return ret;
+		
+		for(Piece p : blackPieces)
 		{
-			for(Piece p : blackPieces)
+			for(String s:this.millsBoard.get(p.keyPos).mill1)
 			{
-				for(String s:this.millsBoard.get(p.keyPos).mill1)
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='P')
 				{
-					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
-					{
+					if(value=='P')
 						ret++;
-					}
-				}
-				for(String s:this.millsBoard.get(p.keyPos).mill2)
-				{
-					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
-					{
-						ret++;
-					}
+					else
+						ret--;
 				}
 			}
-		}else
-		{
-			for(Piece p : whitePieces)
+			for(String s:this.millsBoard.get(p.keyPos).mill2)
 			{
-				for(String s:this.adjacentsBoard.get(p.keyPos).adj)
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='P')
 				{
-					if(board.get(s).piece!=null && board.get(s).piece.getValue()==value)
-					{
+					if(value=='P')
 						ret++;
-					}
+					else
+						ret--;
+				}
+			}
+		}
+	
+		for(Piece p : whitePieces)
+		{
+			for(String s:this.millsBoard.get(p.keyPos).mill1)
+			{
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
+				{
+					if(value=='B')
+						ret++;
+					else
+						ret--;
+				}
+			}
+			for(String s:this.millsBoard.get(p.keyPos).mill2)
+			{
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
+				{
+					if(value=='B')
+						ret++;
+					else
+						ret--;
 				}
 			}
 		}
 		
+			
 		return ret;
 	}
 
