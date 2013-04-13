@@ -7,13 +7,13 @@ public class MiniMax {
 	public static int play(Move move,int nMoves,boolean max,int alpha, int beta, char turn){
 		nMoves++;
 		char v;
-		if(move.value=='P')
-			v='B';
+		if(move.value=='B')
+			v='W';
 		else 
-			v='P';
+			v='B';
 		//System.out.println("Minimax: "+nMoves);
 		//System.out.println("Turn: "+move.value);
-		/*if(move.removedPiece!=null && move.removedPiece.x==2 && move.removedPiece.y==4 && move.removedPiece.getValue()=='B' && NineMansMorris.board.white>4)
+		/*if(move.removedPiece!=null && move.removedPiece.x==2 && move.removedPiece.y==4 && move.removedPiece.getValue()=='W' && NineMansMorris.board.white>4)
 		{
 			System.out.println("Erro nabiço....."+move.stage+" "+move.value+" ");
 		}*/

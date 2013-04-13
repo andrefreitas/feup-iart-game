@@ -13,20 +13,23 @@ import algorithms.MiniMax;
 import game.Board;
 import game.Move;
 import game.Piece;
+import graphical.MainMenu;
 
 public class NineMansMorris {
 
 	public static int i;
 	public static Board board;
+	public static int gameType=0; //0-human vs human; 1-human vs minimax
+	public static char botColor='B';
 	
 	public static void main(String[] args) {
 		board=new Board();
 		Date d1=new Date();
 		long t1=d1.getTime();
 		
-		
+		new MainMenu();
 		//test1(500);
-		test2();
+		//test2();
 		
 		d1=new Date();
 		long t2=d1.getTime();
@@ -42,18 +45,18 @@ public class NineMansMorris {
 			Vector<Move> moves=board.getPossibleMoves(board.turn);
 			if(moves.size()==0)
 			{
-				if(board.turn=='P')
+				if(board.turn=='B')
 				{
-					winner='B';
+					winner='W';
 				}else
 				{
-					winner='P';
+					winner='B';
 				}
 				
 				break;
 			}
 			
-			if(board.turn=='B')
+			if(board.turn=='W')
 			{
 				//board.getMatrix();
 				int i=0;

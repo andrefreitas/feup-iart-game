@@ -47,7 +47,7 @@ public class Board {
 		whiteMoves=0;
 		blackStage=0;
 		whiteStage=0;
-		turn='P';
+		turn='B';
 		initBoard();
 		initAdjacentsBoard();
 		initmillsBoard();
@@ -392,9 +392,9 @@ public class Board {
 	public char gameOver()
 	{
 		if(black<3)
-			return 'B';
+			return 'W';
 		if(white<3)
-			return 'P';
+			return 'B';
 		
 		return 'X';
 	}
@@ -409,12 +409,12 @@ public class Board {
 		Boolean blackTurn=false;
 		Vector<Piece> pieces=null;
 		Vector<Piece> piecesRemove=null;
-		if(m.value=='P')
+		if(m.value=='B')
 		{
 			blackTurn=true;
 			pieces=blackPieces;
 			piecesRemove=whitePieces;
-		}else if(m.value=='B')
+		}else if(m.value=='W')
 		{
 			pieces=whitePieces;
 			piecesRemove=blackPieces;
@@ -442,7 +442,7 @@ public class Board {
 					idx++;
 				}
 				piecesRemove.remove(idx);
-				if(m.removedPiece.getValue()=='P')
+				if(m.removedPiece.getValue()=='B')
 				{
 					black--;
 				}else
@@ -545,7 +545,7 @@ public class Board {
 					this.getMatrix();
 				}
 				piecesRemove.remove(idx);
-				if(m.removedPiece.getValue()=='P')
+				if(m.removedPiece.getValue()=='B')
 				{
 					black--;
 				}else
@@ -557,11 +557,11 @@ public class Board {
 		
 		if(blackTurn)
 		{
-			turn='B';
+			turn='W';
 			blackMoves++;
 		}else
 		{
-			turn='P';
+			turn='B';
 			whiteMoves++;
 		}
 		
@@ -593,7 +593,7 @@ public class Board {
 			return ret;
 		
 		int stage;
-		if(turn=='P')
+		if(turn=='B')
 		{
 			stage=blackStage;
 		}else{
@@ -658,10 +658,10 @@ public class Board {
 		}else if(stage==1)
 		{
 			Vector<Piece> pieces=null;
-			if(turn=='P')
+			if(turn=='B')
 			{
 				pieces=blackPieces;
-			}else if(turn=='B')
+			}else if(turn=='W')
 			{
 				pieces=whitePieces;
 			}
@@ -703,10 +703,10 @@ public class Board {
 		}else if(stage==2)
 		{
 			Vector<Piece> pieces=null;
-			if(turn=='P')
+			if(turn=='B')
 			{
 				pieces=blackPieces;
-			}else if(turn=='B')
+			}else if(turn=='W')
 			{
 				pieces=whitePieces;
 			}
@@ -806,10 +806,10 @@ public class Board {
 		{
 			
 			Vector<Piece> pieces=null;
-			if(turn=='P')
+			if(turn=='B')
 			{
 				pieces=whitePieces;  //peças adversarias
-			}else if(turn=='B')
+			}else if(turn=='W')
 			{
 				pieces=blackPieces;  //peças adversarias
 			}
@@ -916,7 +916,7 @@ public class Board {
 				}
 				
 			}else
-			if(value=='P')
+			if(value=='B')
 			{
 				ret= black - white;
 				ret*=2;
@@ -933,9 +933,9 @@ public class Board {
 		{
 			for(String s:this.millsBoard.get(p.keyPos).mill1)
 			{
-				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='P')
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
 				{
-					if(value=='P')
+					if(value=='B')
 						ret++;
 					else
 						ret--;
@@ -943,9 +943,9 @@ public class Board {
 			}
 			for(String s:this.millsBoard.get(p.keyPos).mill2)
 			{
-				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='P')
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
 				{
-					if(value=='P')
+					if(value=='B')
 						ret++;
 					else
 						ret--;
@@ -957,9 +957,9 @@ public class Board {
 		{
 			for(String s:this.millsBoard.get(p.keyPos).mill1)
 			{
-				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='W')
 				{
-					if(value=='B')
+					if(value=='W')
 						ret++;
 					else
 						ret--;
@@ -967,9 +967,9 @@ public class Board {
 			}
 			for(String s:this.millsBoard.get(p.keyPos).mill2)
 			{
-				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='B')
+				if(board.get(s).piece!=null && board.get(s).piece.getValue()=='W')
 				{
-					if(value=='B')
+					if(value=='W')
 						ret++;
 					else
 						ret--;
@@ -1000,7 +1000,7 @@ public class Board {
 		{
 			if(move.removedPiece!=null)
 			{
-				if(move.removedPiece.getValue()=='P')
+				if(move.removedPiece.getValue()=='B')
 				{
 					Piece poux=move.removedPiece.clone();
 					blackPieces.add(poux);
@@ -1019,7 +1019,7 @@ public class Board {
 			int finalX=move.finalPos[0];
 			int finalY=move.finalPos[1];
 			Piece p=board.get(finalX+"-"+finalY).piece;
-			if(p.getValue()=='P')
+			if(p.getValue()=='B')
 			{
 				//blackPieces.remove(p);
 				int i=0;
@@ -1032,7 +1032,7 @@ public class Board {
 				}
 				blackPieces.remove(i);
 				blackMoves--;
-				this.turn='P';
+				this.turn='B';
 			}else
 			{
 				//whitePieces.remove(p);
@@ -1046,14 +1046,14 @@ public class Board {
 				}
 				whitePieces.remove(i);
 				whiteMoves--;
-				this.turn='B';
+				this.turn='W';
 			}
 			board.get(finalX+"-"+finalY).piece=null;
 			
 		}else{
 			if(move.removedPiece!=null)
 			{
-				if(move.removedPiece.getValue()=='P')
+				if(move.removedPiece.getValue()=='B')
 				{
 					Piece poux=move.removedPiece.clone();
 					blackPieces.add(poux);
@@ -1071,17 +1071,17 @@ public class Board {
 			int finalX=move.finalPos[0];
 			int finalY=move.finalPos[1];
 			Piece p=board.get(finalX+"-"+finalY).piece;
-			if(p.getValue()=='P')
+			if(p.getValue()=='B')
 			{
 				
 				
 				blackMoves--;
-				this.turn='P';
+				this.turn='B';
 			}else
 			{
 				
 				whiteMoves--;
-				this.turn='B';
+				this.turn='W';
 			}
 			p.x=move.initPos[0];
 			p.y=move.initPos[1];
@@ -1089,7 +1089,7 @@ public class Board {
 			board.get(p.keyPos).piece=p;
 			board.get(finalX+"-"+finalY).piece=null;
 		}
-		if(move.value=='P')
+		if(move.value=='B')
 		{
 			blackStage=move.stage;
 		}else{
