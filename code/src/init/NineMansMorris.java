@@ -13,6 +13,7 @@ import algorithms.MiniMax;
 import game.Board;
 import game.Move;
 import game.Piece;
+import graphical.GameWindow;
 import graphical.MainMenu;
 
 public class NineMansMorris {
@@ -23,7 +24,7 @@ public class NineMansMorris {
 	public static char botColor='B';
 	
 	public static void main(String[] args) {
-		board=new Board();
+		//board=new Board();
 		Date d1=new Date();
 		long t1=d1.getTime();
 		
@@ -149,6 +150,28 @@ public class NineMansMorris {
 		System.out.println("Peças pretas: "+board.black+", peças brancas: "+board.white);
 		board.getMatrix();
 		System.out.println("Vitoria: "+board.gameOver());
+	}
+
+	public static void playBot(Vector<Move> moves) {
+		
+		Move nextMove=null;
+		int moveVal=-10000;
+		for(Move m : moves)
+		{
+			
+			int minimaxVal=MiniMax.play(m, 0,false, moveVal, 10000, board.turn);
+			if(minimaxVal>moveVal)
+			{
+				moveVal=minimaxVal;
+				nextMove=m;
+			}
+			
+		}
+		nextMove.showMove();
+		board.makeMove(nextMove);
+		((GameWindow) GameWindow.self).botPlay(nextMove);
+		board.getMatrix();
+		System.out.println("Turn: "+board.turn);
 	}
 
 }

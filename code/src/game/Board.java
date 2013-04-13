@@ -40,6 +40,8 @@ public class Board {
 	public int whiteStage;
 	public char turn;
 	
+	public int difficulty=3;
+	
 	public Board(){
 		black=9;
 		white=9;
@@ -135,8 +137,8 @@ public class Board {
 		Mill a11=new Mill();
 		a11.mill1.add("1-1");
 		a11.mill1.add("5-1");
-		a11.mill2.add("5-3");
-		a11.mill2.add("5-5");
+		a11.mill2.add("3-0");
+		a11.mill2.add("3-2");
 		millsBoard.put("3-1",a11);
 		
 		Mill a12=new Mill();
@@ -905,17 +907,7 @@ public class Board {
 			ret= -1000;
 		else if(this.gameOver()=='X')
 		{
-			if(false && playedMoves.contains(lastMove.getHashKey()))
-			{
-				if(lastMove.value==value)
-				{
-					ret= -50;
-				}else
-				{
-					ret= 50;
-				}
-				
-			}else
+			
 			if(value=='B')
 			{
 				ret= black - white;
@@ -981,9 +973,9 @@ public class Board {
 		return ret;
 	}
 
-	public boolean stopMiniMax(int nMoves) {
+	public boolean stopMiniMax(int nMoves, int sizeMoves) {
 		
-		if(nMoves>3)
+		if(nMoves>difficulty || (difficulty>2 && sizeMoves>20 && nMoves>2))
 			return true;
 		
 		if(gameOver()=='X')

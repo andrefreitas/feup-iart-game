@@ -19,22 +19,29 @@ public class PieceImage {
 	
 	public void showWhite()
 	{
+		System.out.println("showWhite "+pos);
 		white.setVisible(true);
 		black.setVisible(false);
+		white.repaint();
+		black.repaint();
 		visible='W';
 		last='W';
 	}
 	
 	public void showBlack()
 	{
+		System.out.println("showBlack "+pos);
 		white.setVisible(false);
 		black.setVisible(true);
+		white.repaint();
+		black.repaint();
 		visible='B';
 		last='B';
 	}
 	
 	public void hidde()
 	{
+		System.out.println("hidde "+pos);
 		white.setVisible(false);
 		black.setVisible(false);
 		visible='X';
@@ -42,6 +49,7 @@ public class PieceImage {
 	
 	public void showLast()
 	{
+		System.out.println("showLast "+pos);
 		if(last=='B')
 			showBlack();
 		if(last=='W')

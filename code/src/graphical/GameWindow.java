@@ -20,6 +20,7 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Color;
 
 public class GameWindow extends JFrame{
 
@@ -49,15 +50,22 @@ public class GameWindow extends JFrame{
 	private Vector<Move> possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
 	private Boolean gameRunning=true;
 	
+	private JLabel turnLabel;
+	
+	private AWTEventListener mouseListener;
+	
 	public GameWindow()
 	{
 		super();
-		
+		board.clear();
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent arg0) {
 				//self.dispose();
 				MainMenu.self.setVisible(true);
+				Toolkit.getDefaultToolkit().removeAWTEventListener(mouseListener);
+				self.removeAll();
+				//self.dispose();
 			}
 		});
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -66,8 +74,7 @@ public class GameWindow extends JFrame{
 		
 		this.setContentPane(initBoard());
 		
-		
-		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+		mouseListener =new AWTEventListener() {
 			public void eventDispatched(AWTEvent event) {
 				if(event instanceof MouseEvent && gameRunning){
 					if(event.getID() == MouseEvent.MOUSE_CLICKED && waitRemove){
@@ -89,11 +96,15 @@ public class GameWindow extends JFrame{
 								{
 									String v="";
 									if(NineMansMorris.board.turn=='B')
-										v="brancos";
+										v="whites";
 									else
-										v="pretos";
+										v="blacks";
 									System.out.println("Vitoria: "+v);
+									turnLabel.setText("Victory for the "+v);
 									gameRunning=false;
+								}else
+								{
+									checkBotAndPlay();
 								}
 							}
 						}
@@ -109,6 +120,8 @@ public class GameWindow extends JFrame{
 						{
 							selectedPiece.setVisible(false);
 							selectedPiece=null;
+							
+							System.out.println("released: "+strPiece);
 							
 							if(strPiece.startsWith("out") || strPiece.startsWith("black") ||
 									strPiece.startsWith("white") ||!validRelease(strPiece))
@@ -136,11 +149,15 @@ public class GameWindow extends JFrame{
 									{
 										String v="";
 										if(NineMansMorris.board.turn=='B')
-											v="brancos";
+											v="whites";
 										else
-											v="pretos";
+											v="blacks";
 										System.out.println("Vitoria: "+v);
+										turnLabel.setText("Victory for the "+v);
 										gameRunning=false;
+									}else
+									{
+										checkBotAndPlay();
 									}
 								}
 							}
@@ -193,7 +210,18 @@ public class GameWindow extends JFrame{
 						}
 						if(selectedPiece!=null)
 						{
-							selectedPiece.setBounds(mouseX, mouseY, 47, 47);
+							int nextX=mouseX-20;
+							int nextY=mouseY-20;
+							if(!strPiece.startsWith("out") && !strPiece.startsWith("black") && 
+									!strPiece.startsWith("white"))
+							{
+								String[] oux=strPiece.split("-");
+								int x=Integer.parseInt(oux[0]);
+								int y=Integer.parseInt(oux[1]);
+								nextX=30+x*71;
+								nextY=20+y*68;
+							}
+							selectedPiece.setBounds(nextX, nextY, 47, 47);
 							selectedPiece.setVisible(true);
 							
 							
@@ -202,7 +230,9 @@ public class GameWindow extends JFrame{
 					
 				}
 			}
-		}, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+		};
+		Toolkit.getDefaultToolkit().addAWTEventListener(mouseListener, 
+				AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
 		
 		
 		
@@ -210,6 +240,73 @@ public class GameWindow extends JFrame{
 		this.setVisible(true);
 		this.repaint();
 		self=this;
+		checkBotAndPlay();
+	}
+
+	protected void checkBotAndPlay() {
+		char turn = NineMansMorris.board.turn;
+		if(NineMansMorris.gameType==1 && turn==NineMansMorris.botColor)
+		{
+			Thread a=new Thread(new Runnable(){
+
+				@Override
+				public void run() {
+					gameRunning=false;
+					System.out.println("Bot tem "+possibleMoves.size()+" jogadas.");
+					NineMansMorris.playBot(possibleMoves);
+					possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
+					if(possibleMoves==null || possibleMoves.size()==0 || NineMansMorris.board.gameOver()!='X')
+					{
+						String v="";
+						if(NineMansMorris.board.turn=='B')
+							v="whites";
+						else
+							v="blacks";
+						System.out.println("Vitoria: "+v);
+						turnLabel.setText("Victory for the "+v);
+						gameRunning=false;
+					}else
+					{
+						gameRunning=true;
+						if(NineMansMorris.board.turn=='B')
+							turnLabel.setText("Turn: Black");
+						else
+							turnLabel.setText("Turn: White");
+					}
+					
+					
+				}
+				
+			});
+			a.start();
+			
+		}
+	}
+	
+	public void botPlay(Move m)
+	{
+		if(m.value=='B')
+		{
+			if(NineMansMorris.board.blackStage!=0)
+			{
+				blackPieceOUT.setVisible(false);
+			}
+			board.get(m.finalPos[0]+"-"+m.finalPos[1]).showBlack();
+		}else{
+			if(NineMansMorris.board.whiteStage!=0)
+			{
+				whitePieceOUT.setVisible(false);
+			}
+			board.get(m.finalPos[0]+"-"+m.finalPos[1]).showWhite();
+		}
+		if(m.stage!=0)
+		{
+			board.get(m.initPos[0]+"-"+m.initPos[1]).hidde();
+		}
+		if(m.removedPiece!=null)
+		{
+			board.get(m.removedPiece.keyPos).hidde();
+		}
 	}
 
 	protected void makeRemove(String strPiece) {
@@ -226,6 +323,10 @@ public class GameWindow extends JFrame{
 				
 					m.showMove();
 					NineMansMorris.board.makeMove(m);
+					if(NineMansMorris.board.turn=='B')
+						turnLabel.setText("Turn: Black");
+					else
+						turnLabel.setText("Turn: White");
 					NineMansMorris.board.getMatrix();
 					
 					System.out.println("Turn: "+NineMansMorris.board.turn);
@@ -254,6 +355,10 @@ public class GameWindow extends JFrame{
 			{
 				m.showMove();
 				NineMansMorris.board.makeMove(m);
+				if(NineMansMorris.board.turn=='B')
+					turnLabel.setText("Turn: Black");
+				else
+					turnLabel.setText("Turn: White");
 				NineMansMorris.board.getMatrix();
 				System.out.println("Turn: "+NineMansMorris.board.turn);
 				this.waitRemove=false;
@@ -294,6 +399,10 @@ public class GameWindow extends JFrame{
 					{
 						m.showMove();
 						NineMansMorris.board.makeMove(m);
+						if(NineMansMorris.board.turn=='B')
+							turnLabel.setText("Turn: Black");
+						else
+							turnLabel.setText("Turn: White");
 						NineMansMorris.board.getMatrix();
 						System.out.println("Turn: "+NineMansMorris.board.turn);
 						
@@ -327,6 +436,10 @@ public class GameWindow extends JFrame{
 				{
 					m.showMove();
 					NineMansMorris.board.makeMove(m);
+					if(NineMansMorris.board.turn=='B')
+						turnLabel.setText("Turn: Black");
+					else
+						turnLabel.setText("Turn: White");
 					NineMansMorris.board.getMatrix();
 					System.out.println("Turn: "+NineMansMorris.board.turn);
 					
@@ -409,6 +522,11 @@ public class GameWindow extends JFrame{
 		board=new HashMap<String,PieceImage>();
 		this.blackPiece.setVisible(false);
 		this.whitePiece.setVisible(false);
+		
+		turnLabel = new JLabel("Turn: Black");
+		turnLabel.setForeground(Color.RED);
+		turnLabel.setBounds(615, 472, 169, 14);
+		ret.add(turnLabel);
 		ret.add(blackPiece);
 		ret.add(whitePiece);
 		for(String str : NineMansMorris.board.board.keySet())

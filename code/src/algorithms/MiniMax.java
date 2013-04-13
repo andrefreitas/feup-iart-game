@@ -22,7 +22,7 @@ public class MiniMax {
 		
 		Vector<Move> childmoves=NineMansMorris.board.getPossibleMoves(v);
 		
-		if(NineMansMorris.board.stopMiniMax(nMoves) || childmoves==null || childmoves.size()==0){
+		if(NineMansMorris.board.stopMiniMax(nMoves,childmoves.size()) || childmoves==null || childmoves.size()==0){
 			//undo move
 			
 			int boardEvaluation=NineMansMorris.board.evaluate(turn);

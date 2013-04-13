@@ -1,5 +1,8 @@
 package graphical;
 
+import game.Board;
+import init.NineMansMorris;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JButton;
@@ -41,7 +44,39 @@ public class MainMenu extends JFrame{
 		JButton btnNewButton = new JButton("Start");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new GameWindow();
+				
+				NineMansMorris.board=new Board();
+				if(rdbtnHumanVsHuman.isSelected())
+				{
+					NineMansMorris.gameType=0;
+					System.out.println("Game type 0");
+				}else if(rdbtnHumanVsMinimax.isSelected())
+				{
+					NineMansMorris.gameType=1;
+					System.out.println("Game type 1");
+				}
+				if(rdbtnEasy.isSelected())
+				{
+					NineMansMorris.board.difficulty=1;
+				}else if(rdbtnMedium.isSelected())
+				{
+					NineMansMorris.board.difficulty=2;
+				}else if(rdbtnHard.isSelected())
+				{
+					NineMansMorris.board.difficulty=3;
+				}
+				System.out.println("Game difficulty: "+NineMansMorris.board.difficulty);
+				Thread a=new Thread(new Runnable(){
+
+					@Override
+					public void run() {
+						new GameWindow();
+						
+					}
+					
+				});
+				a.start();
+				
 				self.setVisible(false);
 			}
 		});
