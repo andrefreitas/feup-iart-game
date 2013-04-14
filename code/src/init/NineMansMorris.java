@@ -160,12 +160,16 @@ public class NineMansMorris {
 		for(Move m : moves)
 		{
 			
-			int minimaxVal=MiniMax.play(m, 0,false, moveVal, 10000, board.turn);
+			int minimaxVal=MiniMax.play(m, 0,false, /*moveVal*/ -10000, 10000, board.turn);
+			//System.out.println("minimax: "+minimaxVal);
 			if(minimaxVal==moveVal)
 			{
 				Random rd= new Random();
-				if(rd.nextDouble()<=((double)1/((double)moves.size()/2)))
+				double nrd=((double)1/((double)moves.size()/2));
+				
+				if(rd.nextDouble()<=nrd)
 				{
+					//System.out.println("rand: <="+nrd);
 					moveVal=minimaxVal;
 					nextMove=m;
 				}

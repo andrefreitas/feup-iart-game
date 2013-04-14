@@ -996,12 +996,26 @@ public class Board {
 							&& m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue())
 					{
 						firstMill=true;
+						if(value=='B')
+						{
+							ret+=90;
+						}else
+						{
+							ret+=-90;
+						}
 						break;
 					}
 					if(m20!=null && m21!=null && !m20.keyPos.startsWith(p0.keyPos) && !m21.keyPos.startsWith(p0.keyPos)
 							&& m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
 					{
 						firstMill=true;
+						if(value=='B')
+						{
+							ret+=90;
+						}else
+						{
+							ret+=-90;
+						}
 						break;
 					}
 				}
@@ -1018,10 +1032,10 @@ public class Board {
 				{
 					if(value=='B')
 					{
-						ret=500;
+						ret+=500;
 					}else
 					{
-						ret=-500;
+						ret+=-500;
 					}
 					break;
 				}
@@ -1043,12 +1057,26 @@ public class Board {
 							&& m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue())
 					{
 						firstMill=true;
+						if(value=='W')
+						{
+							ret+=90;
+						}else
+						{
+							ret+=-90;
+						}
 						break;
 					}
 					if(m20!=null && m21!=null && !m20.keyPos.startsWith(p0.keyPos) && !m21.keyPos.startsWith(p0.keyPos)
 							&& m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
 					{
 						firstMill=true;
+						if(value=='W')
+						{
+							ret+=90;
+						}else
+						{
+							ret+=-90;
+						}
 						break;
 					}
 				}
@@ -1081,7 +1109,7 @@ public class Board {
 	
 	public boolean stopMiniMax(int nMoves, int sizeMoves) {
 		
-		if(nMoves>difficulty || (difficulty>2 && sizeMoves>20 && nMoves>2))
+		if(nMoves>difficulty || (difficulty>2 && sizeMoves>30 && nMoves>2))
 			return true;
 		
 		if(gameOver()=='X')
