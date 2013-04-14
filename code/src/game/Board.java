@@ -902,24 +902,24 @@ public class Board {
 	public int evaluate(char value) {
 		int ret=0;
 		if(this.gameOver()==value)
-			ret= 1000;
+			return 1000;
 		else if(this.gameOver()!='X')
-			ret= -1000;
+			return -1000;
 		else if(this.gameOver()=='X')
 		{
 			
 			if(value=='B')
 			{
 				ret= black - white;
-				ret*=2;
+				ret*=100;
 			}else
 			{
 				ret= white-black;
-				ret*=2;
+				ret*=100;
 			}
 		}
-		if(ret<-999 || ret>999)
-			return ret;
+		
+		ret += evalFormation(value);
 		
 		for(Piece p : blackPieces)
 		{
@@ -969,10 +969,116 @@ public class Board {
 			}
 		}
 		
-			
+		if(ret>990)
+			return 990;
+		if(ret<-990)
+			return -990;
+		
 		return ret;
 	}
 
+	private int evalFormation(char value)
+	{
+		Boolean firstMill=false;
+		int ret=0;
+		for(Piece p0: blackPieces)
+		{
+			for(String strP1: adjacentsBoard.get(p0.keyPos).adj)
+			{
+				if(board.get(strP1).piece==null)
+				{
+					Mill m = millsBoard.get(strP1);
+					Piece m10=board.get(m.mill1.get(0)).piece;
+					Piece m11=board.get(m.mill1.get(1)).piece;
+					Piece m20=board.get(m.mill2.get(0)).piece;
+					Piece m21=board.get(m.mill2.get(1)).piece;
+					if(m10!=null && m11!=null && !m10.keyPos.startsWith(p0.keyPos) && !m11.keyPos.startsWith(p0.keyPos)
+							&& m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue())
+					{
+						firstMill=true;
+						break;
+					}
+					if(m20!=null && m21!=null && !m20.keyPos.startsWith(p0.keyPos) && !m21.keyPos.startsWith(p0.keyPos)
+							&& m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
+					{
+						firstMill=true;
+						break;
+					}
+				}
+			}
+			if(firstMill)
+			{
+				Mill m = millsBoard.get(p0.keyPos);
+				Piece m10=board.get(m.mill1.get(0)).piece;
+				Piece m11=board.get(m.mill1.get(1)).piece;
+				Piece m20=board.get(m.mill2.get(0)).piece;
+				Piece m21=board.get(m.mill2.get(1)).piece;
+				if(m10!=null && m11!=null && m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue() ||
+						m20!=null && m21!=null && m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
+				{
+					if(value=='B')
+					{
+						ret=500;
+					}else
+					{
+						ret=-500;
+					}
+					break;
+				}
+			}
+		}
+		firstMill=false;
+		for(Piece p0: whitePieces)
+		{
+			for(String strP1: adjacentsBoard.get(p0.keyPos).adj)
+			{
+				if(board.get(strP1).piece==null)
+				{
+					Mill m = millsBoard.get(strP1);
+					Piece m10=board.get(m.mill1.get(0)).piece;
+					Piece m11=board.get(m.mill1.get(1)).piece;
+					Piece m20=board.get(m.mill2.get(0)).piece;
+					Piece m21=board.get(m.mill2.get(1)).piece;
+					if(m10!=null && m11!=null && !m10.keyPos.startsWith(p0.keyPos) && !m11.keyPos.startsWith(p0.keyPos)
+							&& m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue())
+					{
+						firstMill=true;
+						break;
+					}
+					if(m20!=null && m21!=null && !m20.keyPos.startsWith(p0.keyPos) && !m21.keyPos.startsWith(p0.keyPos)
+							&& m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
+					{
+						firstMill=true;
+						break;
+					}
+				}
+			}
+			if(firstMill)
+			{
+				Mill m = millsBoard.get(p0.keyPos);
+				Piece m10=board.get(m.mill1.get(0)).piece;
+				Piece m11=board.get(m.mill1.get(1)).piece;
+				Piece m20=board.get(m.mill2.get(0)).piece;
+				Piece m21=board.get(m.mill2.get(1)).piece;
+				if(m10!=null && m11!=null && m10.getValue()==p0.getValue() && m11.getValue()==p0.getValue() ||
+						m20!=null && m21!=null && m20.getValue()==p0.getValue() && m21.getValue()==p0.getValue())
+				{
+					if(value=='W')
+					{
+						ret+=500;
+					}else
+					{
+						ret+=-500;
+					}
+					break;
+				}
+			}
+		}
+		
+		
+		return ret;
+	}
+	
 	public boolean stopMiniMax(int nMoves, int sizeMoves) {
 		
 		if(nMoves>difficulty || (difficulty>2 && sizeMoves>20 && nMoves>2))

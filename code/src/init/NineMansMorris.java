@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.Random;
 import java.util.Vector;
 
 //import complexity.Profiling;
@@ -160,6 +161,15 @@ public class NineMansMorris {
 		{
 			
 			int minimaxVal=MiniMax.play(m, 0,false, moveVal, 10000, board.turn);
+			if(minimaxVal==moveVal)
+			{
+				Random rd= new Random();
+				if(rd.nextDouble()<=((double)1/((double)moves.size()/2)))
+				{
+					moveVal=minimaxVal;
+					nextMove=m;
+				}
+			}
 			if(minimaxVal>moveVal)
 			{
 				moveVal=minimaxVal;
@@ -168,6 +178,7 @@ public class NineMansMorris {
 			
 		}
 		nextMove.showMove();
+		System.out.println("Valor jogada: "+moveVal);
 		board.makeMove(nextMove);
 		((GameWindow) GameWindow.self).botPlay(nextMove);
 		board.getMatrix();

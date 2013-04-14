@@ -19,7 +19,7 @@ public class PieceImage {
 	
 	public void showWhite()
 	{
-		System.out.println("showWhite "+pos);
+		//System.out.println("showWhite "+pos);
 		white.setVisible(true);
 		black.setVisible(false);
 		white.repaint();
@@ -30,7 +30,7 @@ public class PieceImage {
 	
 	public void showBlack()
 	{
-		System.out.println("showBlack "+pos);
+		//System.out.println("showBlack "+pos);
 		white.setVisible(false);
 		black.setVisible(true);
 		white.repaint();
@@ -41,7 +41,7 @@ public class PieceImage {
 	
 	public void hidde()
 	{
-		System.out.println("hidde "+pos);
+		//System.out.println("hidde "+pos);
 		white.setVisible(false);
 		black.setVisible(false);
 		visible='X';
@@ -49,7 +49,7 @@ public class PieceImage {
 	
 	public void showLast()
 	{
-		System.out.println("showLast "+pos);
+		//System.out.println("showLast "+pos);
 		if(last=='B')
 			showBlack();
 		if(last=='W')
