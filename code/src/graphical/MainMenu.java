@@ -4,6 +4,7 @@ import game.Board;
 import init.NineMansMorris;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
@@ -20,7 +21,11 @@ public class MainMenu extends JFrame{
 
 	public static JFrame self;
 	
+	private JLabel background = new JLabel(new ImageIcon(
+			ClassLoader.getSystemClassLoader().getResource("images/fundo.jpg")));
 	
+	private JLabel background2 = new JLabel(new ImageIcon(
+			ClassLoader.getSystemClassLoader().getResource("images/fundo.jpg")));
 	
 	private static JRadioButton rdbtnHumanVsMinimax;
 	private static JRadioButton rdbtnHumanVsHuman;
@@ -94,10 +99,12 @@ public class MainMenu extends JFrame{
 		getContentPane().add(btnExit);
 		
 		JLabel lblNewLabel = new JLabel("Options: ");
+		
 		lblNewLabel.setBounds(214, 43, 76, 14);
 		getContentPane().add(lblNewLabel);
 		
 		rdbtnHumanVsHuman = new JRadioButton("Human vs Human");
+		
 		rdbtnHumanVsHuman.setSelected(true);
 		
 		rdbtnHumanVsHuman.setBounds(192, 64, 153, 23);
@@ -134,6 +141,9 @@ public class MainMenu extends JFrame{
 		gameDifficulty.add(rdbtnEasy);
 		gameDifficulty.add(rdbtnMedium);
 		gameDifficulty.add(rdbtnHard);
+		
+		background.setBounds(0, 0, 387, 320);
+		getContentPane().add(background);
 		
 		this.setVisible(true);
 		this.repaint();

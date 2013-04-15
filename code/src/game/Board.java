@@ -393,6 +393,45 @@ public class Board {
 
 	public char gameOver()
 	{
+		boolean moves=false;
+		if(black>3 && blackStage>0)
+		{
+			for(Piece p:blackPieces)
+			{
+				for(String s:adjacentsBoard.get(p.keyPos).adj)
+				{
+					if(board.get(s).piece==null)
+					{
+						moves=true;
+						break;
+					}
+				}
+				if(moves)
+					break;
+			}
+			if(moves==false)
+				return 'W';
+		}
+		moves=false;
+		if(white>3 && whiteStage>0)
+		{
+			for(Piece p:whitePieces)
+			{
+				for(String s:adjacentsBoard.get(p.keyPos).adj)
+				{
+					if(board.get(s).piece==null)
+					{
+						moves=true;
+						break;
+					}
+				}
+				if(moves)
+					break;
+			}
+			if(moves==false)
+				return 'B';
+		}
+		
 		if(black<3)
 			return 'W';
 		if(white<3)
