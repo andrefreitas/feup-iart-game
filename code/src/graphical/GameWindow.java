@@ -1,9 +1,5 @@
 package graphical;
 
-import game.Board;
-import game.Move;
-import game.Piece;
-import init.NineMansMorris;
 
 import java.awt.AWTEvent;
 import java.awt.Container;
@@ -22,96 +18,100 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Color;
 
-public class GameWindow extends JFrame{
+import logic.Game;
+import logic.Move;
+import logic.Piece;
+
+/**
+ * Classe que implementa os gráficos do jogo e a interação com o utilizador, invocando os métodos da lógica apropriados.
+ */
+public class GameWindow extends JFrame
+{
+	//TODO: Acabar (grande) refactoring e documentação dos métodos
+	
+	private static final long serialVersionUID = 6675690679297219233L;
 
 	public static JFrame self;
-	
-	
-		
+
+	//Recursos gráficos
 	private JLabel background = new JLabel(new ImageIcon(
-			ClassLoader.getSystemClassLoader().getResource("images/fundo2.png")));
+			ClassLoader.getSystemClassLoader().getResource("images/fundo_jogo.png")));
 	private URL urlWhite = ClassLoader.getSystemClassLoader().getResource("images/pecabranca.png");
 	private URL urlBlack = ClassLoader.getSystemClassLoader().getResource("images/pecapreta.png");	
-	
-	private HashMap<String,PieceImage> board=new HashMap<String,PieceImage>();
-	
 	public JLabel blackPiece = new JLabel(new ImageIcon(urlBlack));
 	public JLabel whitePiece = new JLabel(new ImageIcon(urlWhite));
-	
 	private JLabel blackPieceOUT = new JLabel(new ImageIcon(urlBlack));
-	private JLabel whitePieceOUT = new JLabel(new ImageIcon(urlWhite));
+	private JLabel whitePieceOUT = new JLabel(new ImageIcon(urlWhite));	
 	
-	private JLabel selectedPiece=null;
-	private PieceImage initPiece=null;
-	private String finalPiece=null;
-	private Boolean failDrag=false;
-	private Boolean waitRemove=false;
-	
-	private Vector<Move> possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
+	private HashMap<String,PieceImage> visualBoard=new HashMap<String,PieceImage>(); //Mapa de imagens de peças atribuídas às slots do tabuleiro (trata-se do tabuleiro como é representado visualmente e não logicamente) TODO: esta separação é desnecessária, tratar disto no refactoring
+
+	private JLabel selectedPiece=null; //Peça selecionada/arrastada pelo jogador
+	private PieceImage initPiece=null; // TODO: ???
+	private String finalPiece=null; // TODO: ???
+	private Boolean failDrag=false; //Se verdadeiro, jogador não arrastou corretamente a peça para nenhuma slot
+	private Boolean waitRemove=false; //Se verdadeiro, jogador formou uma mill mas ainda não removeu a peça do adversário
+
+	private Vector<Move> possibleMoves=Game.board.getPossibleMoves(Game.board.turn); //Vector de jogadas possíveis para o jogador atual, só é gerado uma vez para cada turno
 	private Boolean gameRunning=true;
-	
-	private JLabel turnLabel;
-	
-	private AWTEventListener mouseListener;
-	
+
+	private JLabel turnLabel; //Label com o texto que identifica o turno do jogador
+
+	private AWTEventListener mouseListener; //Objeto que escuta as ações do utilizador
+
 	public GameWindow()
 	{
 		super();
-		board.clear();
+		visualBoard.clear();
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosed(WindowEvent arg0) {
-				//self.dispose();
-				MainMenu.self.setVisible(true);
+			public void windowClosed(WindowEvent arg0) 
+			{	
+				self.removeWindowListener(this);
 				Toolkit.getDefaultToolkit().removeAWTEventListener(mouseListener);
+				MainMenu.self.setVisible(true);
 				self.removeAll();
-				//self.dispose();
+				self.dispose();				
 			}
 		});
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setBounds(200, 100, 800, 525);
 		this.setResizable(false);
-		
 		this.setContentPane(initBoard());
-		
-		mouseListener =new AWTEventListener() {
+
+		mouseListener = new AWTEventListener() {
 			public void eventDispatched(AWTEvent event) {
-				if(event instanceof MouseEvent && gameRunning){
-					if(event.getID() == MouseEvent.MOUSE_CLICKED && waitRemove){
+				if(event instanceof MouseEvent && gameRunning)
+				{
+					if(event.getID() == MouseEvent.MOUSE_CLICKED && waitRemove)
+					{
 						int mouseX=((MouseEvent) event).getX()-10;
 						int mouseY=((MouseEvent) event).getY()-30;
 						String strPiece=getMouseToPiece(mouseX, mouseY);
-						
-						if(strPiece.startsWith("out") || strPiece.startsWith("black") ||
-								strPiece.startsWith("white") )
-						{
-							
-						}else
+
+						if(!strPiece.startsWith("out") && !strPiece.startsWith("black") && !strPiece.startsWith("white"))
 						{
 							makeRemove(strPiece);
 							if(!waitRemove)
 							{
-								possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
-								if(possibleMoves==null || possibleMoves.size()==0 || NineMansMorris.board.gameOver()!='X')
+								possibleMoves=Game.board.getPossibleMoves(Game.board.turn);
+								if(possibleMoves==null || possibleMoves.size()==0 || Game.board.gameOver()!='X')
 								{
 									String v="";
-									if(NineMansMorris.board.turn=='B')
+									if(Game.board.turn=='B')
 										v="whites";
 									else
 										v="blacks";
 									System.out.println("Vitoria: "+v);
 									turnLabel.setText("Victory for the "+v);
 									gameRunning=false;
-								}else
-								{
-									checkBotAndPlay();
 								}
+								else
+									checkBotAndPlay();
 							}
 						}
-						
-						
-					}else if(event.getID() == MouseEvent.MOUSE_RELEASED && waitRemove==false){
-						
+					}
+					else if(event.getID() == MouseEvent.MOUSE_RELEASED && waitRemove==false)
+					{
 						int mouseX=((MouseEvent) event).getX()-10;
 						int mouseY=((MouseEvent) event).getY()-30;
 						String strPiece=getMouseToPiece(mouseX, mouseY);
@@ -120,93 +120,88 @@ public class GameWindow extends JFrame{
 						{
 							selectedPiece.setVisible(false);
 							selectedPiece=null;
-							
+
 							System.out.println("released: "+strPiece);
-							
-							if(strPiece.startsWith("out") || strPiece.startsWith("black") ||
-									strPiece.startsWith("white") ||!validRelease(strPiece))
+
+							if(strPiece.startsWith("out") || strPiece.startsWith("black") || strPiece.startsWith("white") ||!validRelease(strPiece))
 							{
 								if(initPiece!=null)
-								{
-								
+								{								
 									initPiece.showLast();
 									initPiece=null;
 								}
-							}else 
+							}
+							else 
 							{
-								
-								Boolean remove=makeMove(strPiece);
+								boolean remove=makeMove(strPiece);
 								if(remove)
 								{
 									finalPiece=strPiece;
 									waitRemove=true;
 									System.out.println("Wait Remove");
-								}else
+								}
+								else
 								{
 									initPiece=null;
-									possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
-									if(possibleMoves==null || possibleMoves.size()==0 || NineMansMorris.board.gameOver()!='X')
+									possibleMoves=Game.board.getPossibleMoves(Game.board.turn);
+									if(possibleMoves==null || possibleMoves.size()==0 || Game.board.gameOver()!='X')
 									{
 										String v="";
-										if(NineMansMorris.board.turn=='B')
+										if(Game.board.turn=='B')
 											v="whites";
 										else
 											v="blacks";
 										System.out.println("Vitoria: "+v);
 										turnLabel.setText("Victory for the "+v);
 										gameRunning=false;
-									}else
-									{
-										checkBotAndPlay();
 									}
+									else
+										checkBotAndPlay();
 								}
 							}
-							
-							
 						}
-						
-					}else if(event.getID() == MouseEvent.MOUSE_DRAGGED && failDrag==false && waitRemove==false){
-						
-						
+					}
+					else if(event.getID() == MouseEvent.MOUSE_DRAGGED && failDrag==false && waitRemove==false)
+					{
 						int mouseX=((MouseEvent) event).getX()-10;
 						int mouseY=((MouseEvent) event).getY()-30;
 						String strPiece=getMouseToPiece(mouseX, mouseY);
-						
+
 						if(selectedPiece==null)
 						{
 							if(strPiece.startsWith("out"))
 							{
 								failDrag=true;
 								selectedPiece=null;
-							}else if(strPiece.startsWith("black") && getStage('B')==0)
-							{
+							}
+							else if(strPiece.startsWith("black") && getStage('B')==0)
 								selectedPiece=blackPiece;
-								
-							}else if(strPiece.startsWith("white") && getStage('W')==0){
+							else if(strPiece.startsWith("white") && getStage('W')==0)
 								selectedPiece=whitePiece;
-							}else if(validPieceToPick(strPiece))
+							else if(validPieceToPick(strPiece))
 							{
-								initPiece=board.get(strPiece);
+								initPiece=visualBoard.get(strPiece);
 								char v=initPiece.getVisible();
 								if(v=='X')
 								{
 									System.out.println("Erro estranho");
 									failDrag=true;
 									selectedPiece=null;
-								}else if(v=='B')
+								}
+								else if(v=='B')
 								{
-									initPiece.hidde();
+									initPiece.hide();
 									selectedPiece=blackPiece;
-								}else if(v=='W')
+								}
+								else if(v=='W')
 								{
-									initPiece.hidde();
+									initPiece.hide();
 									selectedPiece=whitePiece;
 								}
-								
-							}else
-							{
-								failDrag=true;
+
 							}
+							else
+								failDrag=true;
 						}
 						if(selectedPiece!=null)
 						{
@@ -215,104 +210,88 @@ public class GameWindow extends JFrame{
 							if(!strPiece.startsWith("out") && !strPiece.startsWith("black") && 
 									!strPiece.startsWith("white"))
 							{
-								String[] oux=strPiece.split("-");
-								int x=Integer.parseInt(oux[0]);
-								int y=Integer.parseInt(oux[1]);
+								int x=Character.getNumericValue(strPiece.charAt(0));
+								int y=Character.getNumericValue(strPiece.charAt(2));
 								nextX=30+x*71;
 								nextY=20+y*68;
 							}
 							selectedPiece.setBounds(nextX, nextY, 47, 47);
 							selectedPiece.setVisible(true);
-							
-							
 						}
 					}
-					
 				}
 			}
 		};
 		Toolkit.getDefaultToolkit().addAWTEventListener(mouseListener, 
 				AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
-		
-		
-		
-		
+
 		this.setVisible(true);
 		this.repaint();
 		self=this;
 		checkBotAndPlay();
 	}
 
-	protected void checkBotAndPlay() {
-		char turn = NineMansMorris.board.turn;
-		if(NineMansMorris.gameType==1 && turn==NineMansMorris.botColor)
+	private void checkBotAndPlay() 
+	{
+		char turn = Game.board.turn;
+		if(Game.gameType==1 && turn==Game.botColor)
 		{
-			Thread a=new Thread(new Runnable(){
-
+			(new Thread(){
 				@Override
-				public void run() {
+				public void run() 
+				{
 					gameRunning=false;
 					System.out.println("Bot tem "+possibleMoves.size()+" jogadas.");
-					NineMansMorris.playBot(possibleMoves);
-					possibleMoves=NineMansMorris.board.getPossibleMoves(NineMansMorris.board.turn);
-					if(possibleMoves==null || possibleMoves.size()==0 || NineMansMorris.board.gameOver()!='X')
+					Game.playBot(possibleMoves);
+					possibleMoves=Game.board.getPossibleMoves(Game.board.turn);
+					if(possibleMoves==null || possibleMoves.size()==0 || Game.board.gameOver()!='X')
 					{
 						String v="";
-						if(NineMansMorris.board.turn=='B')
+						if(Game.board.turn=='B')
 							v="whites";
 						else
 							v="blacks";
 						System.out.println("Vitoria: "+v);
 						turnLabel.setText("Victory for the "+v);
 						gameRunning=false;
-					}else
+					}
+					else
 					{
 						gameRunning=true;
-						if(NineMansMorris.board.turn=='B')
+						if(Game.board.turn=='B')
 							turnLabel.setText("Turn: Black");
 						else
 							turnLabel.setText("Turn: White");
 					}
-					
-					
 				}
-				
-			});
-			a.start();
-			
+			}).start();
 		}
 	}
-	
+
 	public void botPlay(Move m)
 	{
 		if(m.value=='B')
 		{
-			if(NineMansMorris.board.blackStage!=0)
-			{
+			if(Game.board.blackStage!=0)
 				blackPieceOUT.setVisible(false);
-			}
-			board.get(m.finalPos[0]+"-"+m.finalPos[1]).showBlack();
-		}else{
-			if(NineMansMorris.board.whiteStage!=0)
-			{
+			visualBoard.get(m.finalPos[0]+"-"+m.finalPos[1]).showBlack();
+		}
+		else
+		{
+			if(Game.board.whiteStage!=0)
 				whitePieceOUT.setVisible(false);
-			}
-			board.get(m.finalPos[0]+"-"+m.finalPos[1]).showWhite();
+			visualBoard.get(m.finalPos[0]+"-"+m.finalPos[1]).showWhite();
 		}
 		if(m.stage!=0)
-		{
-			board.get(m.initPos[0]+"-"+m.initPos[1]).hidde();
-		}
+			visualBoard.get(m.initPos[0]+"-"+m.initPos[1]).hide();
 		if(m.removedPiece!=null)
-		{
-			board.get(m.removedPiece.keyPos).hidde();
-		}
+			visualBoard.get(m.removedPiece.keyPos).hide();
 	}
 
-	protected void makeRemove(String strPiece) {
-		
+	private void makeRemove(String strPiece) 
+	{
 		System.out.println("Trying to remove: "+strPiece);
-		
+
 		for(Move m: possibleMoves)
 		{
 			if(initPiece==null)
@@ -320,72 +299,70 @@ public class GameWindow extends JFrame{
 				if(m.stage==0 && finalPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]) &&
 						m.removedPiece!=null && m.removedPiece.keyPos.startsWith(strPiece))
 				{
-				
+
 					m.showMove();
-					NineMansMorris.board.makeMove(m);
-					if(NineMansMorris.board.turn=='B')
+					Game.board.makeMove(m);
+					if(Game.board.turn=='B')
 						turnLabel.setText("Turn: Black");
 					else
 						turnLabel.setText("Turn: White");
-					NineMansMorris.board.getMatrix();
-					
-					System.out.println("Turn: "+NineMansMorris.board.turn);
+					Game.board.getMatrix();
+
+					System.out.println("Turn: "+Game.board.turn);
 					this.waitRemove=false;
 					if(m.value=='B')
 					{
-						if(NineMansMorris.board.blackStage!=0)
-						{
+						if(Game.board.blackStage!=0)
 							blackPieceOUT.setVisible(false);
-						}
-						board.get(strPiece).hidde();
-					}else{
-						if(NineMansMorris.board.whiteStage!=0)
-						{
-							whitePieceOUT.setVisible(false);
-						}
-						board.get(strPiece).hidde();
+						visualBoard.get(strPiece).hide();
 					}
-					
+					else
+					{
+						if(Game.board.whiteStage!=0)
+							whitePieceOUT.setVisible(false);
+						visualBoard.get(strPiece).hide();
+					}
+
 					break;
 				}
-			}else
-			if(m.stage!=0 && initPiece.pos.startsWith(m.initPos[0]+"-"+m.initPos[1]) && 
-				finalPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]) &&
-				m.removedPiece!=null && m.removedPiece.keyPos.startsWith(strPiece))
+			}
+			else if(m.stage!=0 && initPiece.pos.startsWith(m.initPos[0]+"-"+m.initPos[1]) && 
+					finalPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]) &&
+					m.removedPiece!=null && m.removedPiece.keyPos.startsWith(strPiece))
 			{
 				m.showMove();
-				NineMansMorris.board.makeMove(m);
-				if(NineMansMorris.board.turn=='B')
+				Game.board.makeMove(m);
+				if(Game.board.turn=='B')
 					turnLabel.setText("Turn: Black");
 				else
 					turnLabel.setText("Turn: White");
-				NineMansMorris.board.getMatrix();
-				System.out.println("Turn: "+NineMansMorris.board.turn);
+				Game.board.getMatrix();
+				System.out.println("Turn: "+Game.board.turn);
 				this.waitRemove=false;
 				if(m.value=='B')
 				{
-					if(NineMansMorris.board.blackStage!=0)
-					{
+					if(Game.board.blackStage!=0)
 						blackPieceOUT.setVisible(false);
-					}
-					board.get(strPiece).hidde();
+
+					visualBoard.get(strPiece).hide();
 					//board.get(finalPiece).showBlack();
-				}else{
-					if(NineMansMorris.board.whiteStage!=0)
-					{
+				}
+				else
+				{
+					if(Game.board.whiteStage!=0)
 						whitePieceOUT.setVisible(false);
-					}
-					board.get(strPiece).hidde();
+
+					visualBoard.get(strPiece).hide();
 					//board.get(finalPiece).showWhite();
 				}
-				
+
 				break;
 			}
-			
 		}
 	}
 
-	protected Boolean makeMove(String strPiece) {
+	private Boolean makeMove(String strPiece) 
+	{
 		Boolean ret=false;
 		int i=0;
 		for(Move m: possibleMoves)
@@ -394,73 +371,64 @@ public class GameWindow extends JFrame{
 			{
 				if(m.stage==0 && strPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]))
 				{
-				
 					if(m.removedPiece==null)
 					{
 						m.showMove();
-						NineMansMorris.board.makeMove(m);
-						if(NineMansMorris.board.turn=='B')
+						Game.board.makeMove(m);
+						if(Game.board.turn=='B')
 							turnLabel.setText("Turn: Black");
 						else
 							turnLabel.setText("Turn: White");
-						NineMansMorris.board.getMatrix();
-						System.out.println("Turn: "+NineMansMorris.board.turn);
-						
-						
-					}else
-					if(m.removedPiece!=null)
-					{
-						ret=true;
+						Game.board.getMatrix();
+						System.out.println("Turn: "+Game.board.turn);
 					}
+					else if(m.removedPiece!=null)
+						ret=true;
+
 					if(m.value=='B')
 					{
-						if(NineMansMorris.board.blackStage!=0)
-						{
+						if(Game.board.blackStage!=0)
 							blackPieceOUT.setVisible(false);
-						}
-						board.get(strPiece).showBlack();
-					}else{
-						if(NineMansMorris.board.whiteStage!=0)
-						{
+						visualBoard.get(strPiece).showBlack();
+					}
+					else
+					{
+						if(Game.board.whiteStage!=0)
 							whitePieceOUT.setVisible(false);
-						}
-						board.get(strPiece).showWhite();
+						visualBoard.get(strPiece).showWhite();
 					}
 					break;
 				}
-			}else
-			if(m.stage!=0 && initPiece.pos.startsWith(m.initPos[0]+"-"+m.initPos[1]) && 
-				strPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]))
+			}
+			else if(m.stage!=0 && initPiece.pos.startsWith(m.initPos[0]+"-"+m.initPos[1]) && 
+					strPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]))
 			{
 				if(m.removedPiece==null)
 				{
 					m.showMove();
-					NineMansMorris.board.makeMove(m);
-					if(NineMansMorris.board.turn=='B')
+					Game.board.makeMove(m);
+					if(Game.board.turn=='B')
 						turnLabel.setText("Turn: Black");
 					else
 						turnLabel.setText("Turn: White");
-					NineMansMorris.board.getMatrix();
-					System.out.println("Turn: "+NineMansMorris.board.turn);
-					
-				}else
-				if(m.removedPiece!=null)
-				{
-					ret=true;
+					Game.board.getMatrix();
+					System.out.println("Turn: "+Game.board.turn);
+
 				}
+				else if(m.removedPiece!=null)
+					ret=true;
+
 				if(m.value=='B')
 				{
-					if(NineMansMorris.board.blackStage!=0)
-					{
+					if(Game.board.blackStage!=0)
 						blackPieceOUT.setVisible(false);
-					}
-					board.get(strPiece).showBlack();
-				}else{
-					if(NineMansMorris.board.whiteStage!=0)
-					{
+					visualBoard.get(strPiece).showBlack();
+				}
+				else
+				{
+					if(Game.board.whiteStage!=0)
 						whitePieceOUT.setVisible(false);
-					}
-					board.get(strPiece).showWhite();
+					visualBoard.get(strPiece).showWhite();
 				}
 				break;
 			}
@@ -474,79 +442,76 @@ public class GameWindow extends JFrame{
 		return ret;
 	}
 
-	protected boolean validRelease(String strPiece) {
-		char turn = NineMansMorris.board.turn;
+	private boolean validRelease(String strPiece) 
+	{
+		char turn = Game.board.turn;
 		int stage=-1;
+
 		if(turn=='B')
-		{
-			stage=NineMansMorris.board.blackStage;
-		}else if(turn=='W')
-		{
-			stage=NineMansMorris.board.whiteStage;
-			
-		}
-		Piece p=NineMansMorris.board.board.get(strPiece).piece;
+			stage=Game.board.blackStage;
+		else if(turn=='W')
+			stage=Game.board.whiteStage;
+
+		Piece p=Game.board.getSlotMap().get(strPiece);
 		if(stage==0 && initPiece==null && p==null)
 			return true;
 		if(stage!=0 && initPiece!=null && p==null)
 			return true;
-		
+
 		return false;
 	}
 
-	protected int getStage(char c) {
-		if(NineMansMorris.board.turn==c)
+	private int getStage(char c) 
+	{
+		if(Game.board.turn==c)
 		{
 			if(c=='B')
-				return NineMansMorris.board.blackStage;
+				return Game.board.blackStage;
 			if(c=='W')
-				return NineMansMorris.board.whiteStage;
+				return Game.board.whiteStage;
 		}
 		return -1;
 	}
 
-	protected boolean validPieceToPick(String strPiece) {
-		
+	private boolean validPieceToPick(String strPiece) 
+	{
 		for(Move m : possibleMoves)
 		{
 			if(m.stage!=0 && strPiece.startsWith(m.initPos[0]+"-"+m.initPos[1]))
-			{
 				return true;
-			}
 		}
 		return false;
 	}
 
-	private Container initBoard() {
+	private Container initBoard() 
+	{
 		Container ret = new Container();
-		board=new HashMap<String,PieceImage>();
+		visualBoard=new HashMap<String,PieceImage>();
 		this.blackPiece.setVisible(false);
 		this.whitePiece.setVisible(false);
-		
+
 		turnLabel = new JLabel("Turn: Black");
 		turnLabel.setForeground(Color.RED);
 		turnLabel.setBounds(615, 472, 169, 14);
 		ret.add(turnLabel);
 		ret.add(blackPiece);
 		ret.add(whitePiece);
-		for(String str : NineMansMorris.board.board.keySet())
+		for(String str : Game.board.getSlotMap().keySet())
 		{
 			JLabel black=new JLabel(new ImageIcon(urlBlack));
 			JLabel white=new JLabel(new ImageIcon(urlWhite));
-			String[] oux=str.split("-");
-			int x=Integer.parseInt(oux[0]);
-			int y=Integer.parseInt(oux[1]);
+			int x=Character.getNumericValue(str.charAt(0));
+			int y=Character.getNumericValue(str.charAt(2));
 			x=30+x*71;
 			y=20+y*68;
 			black.setBounds(x, y, 47, 47);
 			white.setBounds(x, y, 47, 47);
 			PieceImage pI = new PieceImage(black,white);
 			pI.pos=str;
-			board.put(str, pI);
-			pI.hidde();
+			visualBoard.put(str, pI);
+			pI.hide();
 			ret.add(white);
 			ret.add(black);
-			
 		}
 		ret.add(blackPieceOUT);
 		ret.add(whitePieceOUT);
@@ -558,27 +523,24 @@ public class GameWindow extends JFrame{
 		ret.add(background);
 		return ret;
 	}
-	
-	public String getMouseToPiece(int x,int y)
+
+	private String getMouseToPiece(int x, int y)
 	{
 		String ret="out";
-		
+
 		if(x>=600 && x<=647 && y>=50 && y<=97)
-		{
 			ret="black";
-		}else if(x>=600 && x<=647 && y>=327 && y<=374)
-		{
+		else if(x>=600 && x<=647 && y>=327 && y<=374)
 			ret="white";
-		}else{
-			
-			for(String str : NineMansMorris.board.board.keySet())
+		else
+		{
+			for(String str : Game.board.getSlotMap().keySet())
 			{
-				String[] oux=str.split("-");
-				int xstr=Integer.parseInt(oux[0]);
-				int ystr=Integer.parseInt(oux[1]);
+				int xstr=Character.getNumericValue(str.charAt(0));
+				int ystr=Character.getNumericValue(str.charAt(2));
 				xstr=30+xstr*71;
 				ystr=20+ystr*68;
-				
+
 				if(x>=xstr && x<=xstr+47 && y>=ystr && y<=ystr+47)
 				{
 					ret=str;
@@ -586,7 +548,7 @@ public class GameWindow extends JFrame{
 				}
 			}
 		}
-		
+
 		return ret;
 	}
 }

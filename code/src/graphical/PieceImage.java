@@ -2,10 +2,13 @@ package graphical;
 
 import javax.swing.JLabel;
 
-public class PieceImage {
-
-	private char visible='X';
-	private char last='X';
+/**
+ * Classe auxiliar para desenho de uma slot do tabuleiro, que pode estar desocupada ou ocupada com uma peça preta ou branca.
+ */
+public class PieceImage 
+{
+	private char visible='X'; //Cor atualmente visível (X-sem cor, B - black, W - white)
+	private char last='X'; //Cor desenhada na última chamada a um método de desenho para esta slot
 	private JLabel black=null;
 	private JLabel white=null;
 	
@@ -16,7 +19,10 @@ public class PieceImage {
 		black=b;
 		white=w;
 	}
-	
+
+	/**
+	 * Desenhar a peça como branca.
+	 */
 	public void showWhite()
 	{
 		//System.out.println("showWhite "+pos);
@@ -28,6 +34,9 @@ public class PieceImage {
 		last='W';
 	}
 	
+	/**
+	 * Desenhar a peça como preta.
+	 */
 	public void showBlack()
 	{
 		//System.out.println("showBlack "+pos);
@@ -39,14 +48,20 @@ public class PieceImage {
 		last='B';
 	}
 	
-	public void hidde()
+	/**
+	 * Fazer a peça desaparecer da slot (visualmente).
+	 */
+	public void hide()
 	{
-		//System.out.println("hidde "+pos);
+		//System.out.println("hide "+pos);
 		white.setVisible(false);
 		black.setVisible(false);
 		visible='X';
 	}
 	
+	/**
+	 * Desenhar a peça com a cor da última vez que foi desenhada (ou sem peça).
+	 */
 	public void showLast()
 	{
 		//System.out.println("showLast "+pos);
@@ -55,9 +70,7 @@ public class PieceImage {
 		if(last=='W')
 			showWhite();
 		if(last=='X')
-			hidde();
-		
-		
+			hide();
 	}
 	
 	public char getVisible()
