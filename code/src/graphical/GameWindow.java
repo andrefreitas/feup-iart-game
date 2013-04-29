@@ -45,6 +45,7 @@ public class GameWindow extends JFrame
 	
 	private HashMap<String,PieceImage> visualBoard=new HashMap<String,PieceImage>(); //Mapa de imagens de peças atribuídas às slots do tabuleiro (trata-se do tabuleiro como é representado visualmente e não logicamente) TODO: esta separação é desnecessária, tratar disto no refactoring
 
+	
 	private JLabel selectedPiece=null; //Peça selecionada/arrastada pelo jogador
 	private PieceImage initPiece=null; // TODO: ???
 	private String finalPiece=null; // TODO: ???
@@ -270,6 +271,7 @@ public class GameWindow extends JFrame
 
 	public void botPlay(Move m)
 	{
+		botMovePlay(m);
 		if(m.value=='B')
 		{
 			if(Game.board.blackStage!=0)
@@ -286,6 +288,133 @@ public class GameWindow extends JFrame
 			visualBoard.get(m.initPos[0]+"-"+m.initPos[1]).hide();
 		if(m.removedPiece!=null)
 			visualBoard.get(m.removedPiece.keyPos).hide();
+	}
+	public void botMovePlay(Move m)
+	{
+		final Move mfinal=m;
+		Thread a = new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				JLabel piece=null;
+				if(mfinal.value=='B')
+				{
+					piece=blackPiece;
+				}else if(mfinal.value=='W')
+				{
+					piece=whitePiece;
+				}
+				if(mfinal.stage!=0)
+				{
+					double x=mfinal.initPos[0]*71+30;
+					double y=mfinal.initPos[1]*68+20;
+					
+					double xf=mfinal.finalPos[0]*71+30;
+					double yf=mfinal.finalPos[1]*68+20;
+					
+					double deltx=xf-x;
+					double delty=yf-y;
+					deltx=deltx/(double)100;
+					delty=delty/(double)100;
+					
+					piece.setBounds((int) x,(int) y, 47, 47);
+					piece.setVisible(true);
+					visualBoard.get(mfinal.initPos[0]+"-"+mfinal.initPos[1]).hide();
+					while(true)
+					{
+						//System.out.println("x:"+x+" y:"+y+" deltx:"+deltx+" delty:"+delty+" xf:"+xf+" yf:"+yf);
+						double difx=xf-x;
+						double dify=yf-y;
+						if(difx<1 && difx>-1)
+							x=xf;
+						else
+							x+=deltx;
+						
+						if(dify<1 && dify>-1)
+							y=yf;
+						else
+							y+=delty;
+						piece.setBounds((int)x,(int) y, 47, 47);
+						
+						if(x==xf && y==yf)
+						{
+							break;
+						}
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					piece.setVisible(false);
+				}else{
+					double x=600;
+					double y=50;
+					if(mfinal.value=='W')
+					{
+						y=327;
+						
+					}else
+					{
+						
+					}
+					double xf=mfinal.finalPos[0]*71+30;
+					double yf=mfinal.finalPos[1]*68+20;
+					
+					double deltx=xf-x;
+					double delty=yf-y;
+					deltx=deltx/(double)100;
+					delty=delty/(double)100;
+					
+					piece.setBounds((int) x,(int) y, 47, 47);
+					piece.setVisible(true);
+					/*
+					 * this.blackPieceOUT.setBounds(600, 50, 47, 47);
+						this.whitePieceOUT.setBounds(600, 327, 47, 47);
+					 * */
+					//visualBoard.get(mfinal.initPos[0]+"-"+mfinal.initPos[1]).hide();
+					while(true)
+					{
+						//System.out.println("x:"+x+" y:"+y+" deltx:"+deltx+" delty:"+delty+" xf:"+xf+" yf:"+yf);
+						double difx=xf-x;
+						double dify=yf-y;
+						if(difx<1 && difx>-1)
+							x=xf;
+						else
+							x+=deltx;
+						
+						if(dify<1 && dify>-1)
+							y=yf;
+						else
+							y+=delty;
+						piece.setBounds((int)x,(int) y, 47, 47);
+						
+						if(x==xf && y==yf)
+						{
+							break;
+						}
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					piece.setVisible(false);
+				}
+				
+			}
+			
+		});
+		a.start();
+		try {
+			a.join();
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void makeRemove(String strPiece) 
