@@ -27,7 +27,7 @@ public class MainMenu extends JFrame
 	//Botões de seleção de modo de jogo
 	private JRadioButton rdbtnHumanVsHuman = new JRadioButton("Humano vs Humano");
 	private JRadioButton rdbtnHumanVsMinimax = new JRadioButton("Humano vs CPU");
-	private JRadioButton rdbtnMinimaxVsMinimax = new JRadioButton("CPU vs CPU (To do)");
+	private JRadioButton rdbtnMinimaxVsMinimax = new JRadioButton("CPU vs CPU");
 	private ButtonGroup gameType = new ButtonGroup();
 
 	//Botões de seleção da dificuldade
@@ -131,7 +131,7 @@ public class MainMenu extends JFrame
 		getContentPane().add(rdbtnHumanVsMinimax);
 		rdbtnMinimaxVsMinimax.setBounds(192, 116, radioButtonWidth, radioButtonHeight);
 		getContentPane().add(rdbtnMinimaxVsMinimax);
-		rdbtnMinimaxVsMinimax.setEnabled(false); //TODO
+		//rdbtnMinimaxVsMinimax.setEnabled(false); //TODO
 		
 		gameType.add(rdbtnHumanVsHuman);
 		gameType.add(rdbtnHumanVsMinimax);

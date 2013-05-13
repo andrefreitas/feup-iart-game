@@ -21,8 +21,8 @@ public class Game
 		Game.board=new Board();
 		Game.gameType=selected_type;
 		Game.board.difficulty=selected_difficulty;		
-		System.out.println("Game type "+Game.gameType);
-		System.out.println("Game difficulty: "+Game.board.difficulty);	
+		//System.out.println("Game type "+Game.gameType);
+		//System.out.println("Game difficulty: "+Game.board.difficulty);	
 	}
 	
 	/**
@@ -57,11 +57,11 @@ public class Game
 			}			
 		}
 		
-		nextMove.showMove();
-		System.out.println("Valor jogada: "+moveVal);
+		//nextMove.showMove();
+		//System.out.println("Valor jogada: "+moveVal);
 		board.makeMove(nextMove);
 		((GameWindow) GameWindow.self).botPlay(nextMove);
-		board.getMatrix();
-		System.out.println("Turn: "+board.turn);
+		//board.getMatrix();
+		//System.out.println("Turn: "+board.turn);
 	}
 }

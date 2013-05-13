@@ -102,7 +102,7 @@ public class GameWindow extends JFrame
 										v="whites";
 									else
 										v="blacks";
-									System.out.println("Vitoria: "+v);
+									//System.out.println("Vitoria: "+v);
 									turnLabel.setText("Victory for the "+v);
 									gameRunning=false;
 								}
@@ -122,7 +122,7 @@ public class GameWindow extends JFrame
 							selectedPiece.setVisible(false);
 							selectedPiece=null;
 
-							System.out.println("released: "+strPiece);
+							//System.out.println("released: "+strPiece);
 
 							if(strPiece.startsWith("out") || strPiece.startsWith("black") || strPiece.startsWith("white") ||!validRelease(strPiece))
 							{
@@ -139,7 +139,7 @@ public class GameWindow extends JFrame
 								{
 									finalPiece=strPiece;
 									waitRemove=true;
-									System.out.println("Wait Remove");
+									//System.out.println("Wait Remove");
 								}
 								else
 								{
@@ -152,7 +152,7 @@ public class GameWindow extends JFrame
 											v="whites";
 										else
 											v="blacks";
-										System.out.println("Vitoria: "+v);
+										//System.out.println("Vitoria: "+v);
 										turnLabel.setText("Victory for the "+v);
 										gameRunning=false;
 									}
@@ -185,7 +185,7 @@ public class GameWindow extends JFrame
 								char v=initPiece.getVisible();
 								if(v=='X')
 								{
-									System.out.println("Erro estranho");
+									//System.out.println("Erro estranho");
 									failDrag=true;
 									selectedPiece=null;
 								}
@@ -235,34 +235,40 @@ public class GameWindow extends JFrame
 	private void checkBotAndPlay() 
 	{
 		char turn = Game.board.turn;
-		if(Game.gameType==1 && turn==Game.botColor)
+		if(Game.gameType==1 && turn==Game.botColor || Game.gameType==2)
 		{
 			(new Thread(){
 				@Override
 				public void run() 
 				{
-					gameRunning=false;
-					System.out.println("Bot tem "+possibleMoves.size()+" jogadas.");
-					Game.playBot(possibleMoves);
-					possibleMoves=Game.board.getPossibleMoves(Game.board.turn);
-					if(possibleMoves==null || possibleMoves.size()==0 || Game.board.gameOver()!='X')
+					while(true)
 					{
-						String v="";
-						if(Game.board.turn=='B')
-							v="whites";
-						else
-							v="blacks";
-						System.out.println("Vitoria: "+v);
-						turnLabel.setText("Victory for the "+v);
 						gameRunning=false;
-					}
-					else
-					{
-						gameRunning=true;
-						if(Game.board.turn=='B')
-							turnLabel.setText("Turn: Black");
+						//System.out.println("Bot tem "+possibleMoves.size()+" jogadas.");
+						Game.playBot(possibleMoves);
+						possibleMoves=Game.board.getPossibleMoves(Game.board.turn);
+						if(possibleMoves==null || possibleMoves.size()==0 || Game.board.gameOver()!='X')
+						{
+							String v="";
+							if(Game.board.turn=='B')
+								v="whites";
+							else
+								v="blacks";
+							//System.out.println("Vitoria: "+v);
+							turnLabel.setText("Victory for the "+v);
+							gameRunning=false;
+							break;
+						}
 						else
-							turnLabel.setText("Turn: White");
+						{
+							gameRunning=true;
+							if(Game.board.turn=='B')
+								turnLabel.setText("Turn: Black");
+							else
+								turnLabel.setText("Turn: White");
+						}
+						if(Game.gameType!=2)
+							break;
 					}
 				}
 			}).start();
@@ -419,7 +425,7 @@ public class GameWindow extends JFrame
 
 	private void makeRemove(String strPiece) 
 	{
-		System.out.println("Trying to remove: "+strPiece);
+		//System.out.println("Trying to remove: "+strPiece);
 
 		for(Move m: possibleMoves)
 		{
@@ -429,15 +435,15 @@ public class GameWindow extends JFrame
 						m.removedPiece!=null && m.removedPiece.keyPos.startsWith(strPiece))
 				{
 
-					m.showMove();
+					//m.showMove();
 					Game.board.makeMove(m);
 					if(Game.board.turn=='B')
 						turnLabel.setText("Turn: Black");
 					else
 						turnLabel.setText("Turn: White");
-					Game.board.getMatrix();
+					//Game.board.getMatrix();
 
-					System.out.println("Turn: "+Game.board.turn);
+					//System.out.println("Turn: "+Game.board.turn);
 					this.waitRemove=false;
 					if(m.value=='B')
 					{
@@ -459,14 +465,14 @@ public class GameWindow extends JFrame
 					finalPiece.startsWith(m.finalPos[0]+"-"+m.finalPos[1]) &&
 					m.removedPiece!=null && m.removedPiece.keyPos.startsWith(strPiece))
 			{
-				m.showMove();
+				//m.showMove();
 				Game.board.makeMove(m);
 				if(Game.board.turn=='B')
 					turnLabel.setText("Turn: Black");
 				else
 					turnLabel.setText("Turn: White");
-				Game.board.getMatrix();
-				System.out.println("Turn: "+Game.board.turn);
+				//Game.board.getMatrix();
+				//System.out.println("Turn: "+Game.board.turn);
 				this.waitRemove=false;
 				if(m.value=='B')
 				{
@@ -502,14 +508,14 @@ public class GameWindow extends JFrame
 				{
 					if(m.removedPiece==null)
 					{
-						m.showMove();
+						//m.showMove();
 						Game.board.makeMove(m);
 						if(Game.board.turn=='B')
 							turnLabel.setText("Turn: Black");
 						else
 							turnLabel.setText("Turn: White");
-						Game.board.getMatrix();
-						System.out.println("Turn: "+Game.board.turn);
+						//Game.board.getMatrix();
+						//System.out.println("Turn: "+Game.board.turn);
 					}
 					else if(m.removedPiece!=null)
 						ret=true;
@@ -534,14 +540,14 @@ public class GameWindow extends JFrame
 			{
 				if(m.removedPiece==null)
 				{
-					m.showMove();
+					//m.showMove();
 					Game.board.makeMove(m);
 					if(Game.board.turn=='B')
 						turnLabel.setText("Turn: Black");
 					else
 						turnLabel.setText("Turn: White");
-					Game.board.getMatrix();
-					System.out.println("Turn: "+Game.board.turn);
+					//Game.board.getMatrix();
+					//System.out.println("Turn: "+Game.board.turn);
 
 				}
 				else if(m.removedPiece!=null)

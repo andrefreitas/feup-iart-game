@@ -22,6 +22,6 @@ public class NineMansMorris
 		//Tests.test2();
 		
 		long after=System.currentTimeMillis();
-		System.out.println("Tempo em milis para criação do menu: "+(after-before));
+		//System.out.println("Tempo em milis para criação do menu: "+(after-before));
 	}
 }
