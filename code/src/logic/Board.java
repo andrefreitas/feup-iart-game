@@ -58,6 +58,8 @@ public class Board
 	public char turn; //Identificador do jogador atual	
 	public int difficulty=3; //Grau de dificuldade
 
+	public int difficulty2=3;
+	
 	public Board()
 	{
 		freeBlacks=9;
@@ -788,7 +790,14 @@ public class Board
 
 	public boolean stopMiniMax(int nMoves, int sizeMoves) 
 	{
-		if(nMoves>difficulty || (difficulty>2 && sizeMoves>30 && nMoves>2))
+		int diff=difficulty;
+		if(Game.gameType==2 && turn!='B')
+		{
+			diff=difficulty2;
+			
+		}
+		
+		if(nMoves>diff || (diff>2 && sizeMoves>30 && nMoves>2))
 			return true;
 
 		if(gameOver()=='X')

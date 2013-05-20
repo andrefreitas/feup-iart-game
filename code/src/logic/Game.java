@@ -25,6 +25,15 @@ public class Game
 		//System.out.println("Game difficulty: "+Game.board.difficulty);	
 	}
 	
+	public static void init(int selected_type, int selected_difficulty, int selected_difficulty2)
+	{
+		Game.board=new Board();
+		Game.gameType=selected_type;
+		Game.board.difficulty=selected_difficulty;	
+		Game.board.difficulty2=selected_difficulty2;
+		//System.out.println(""+Game.board.difficulty+" - "+Game.board.difficulty2);
+	}
+	
 	/**
 	 * Método auxiliar que permite pedir uma jogada ao computador. Invoca o minimax com os devidos parâmetros iniciais, escolhe jogadas aleatórias em caso de empate...
 	 * @param moves Vector de jogadas possíveis.

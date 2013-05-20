@@ -5,10 +5,14 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JButton;
+
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import logic.Game;
 
@@ -36,9 +40,33 @@ public class MainMenu extends JFrame
 	private JRadioButton rdbtnHard = new JRadioButton("Difícil");
 	private ButtonGroup gameDifficulty = new ButtonGroup();
 	
+	//Botoes 2º bot
+	private JLabel label2bot;
+	private JRadioButton radioButton2botF;
+	private JRadioButton radioButton2botM;
+	private JRadioButton radioButton2botD;
+	private ButtonGroup gameDifficulty2bot = new ButtonGroup();
+	
 	public static final int radioButtonWidth = 153;
 	public static final int radioButtonHeight = 23;
 
+	
+	public void show2bot()
+	{
+		label2bot.setVisible(true);
+		radioButton2botF.setVisible(true);
+		radioButton2botM.setVisible(true);
+		radioButton2botD.setVisible(true);
+	}
+	
+	public void hide2bot()
+	{
+		label2bot.setVisible(false);
+		radioButton2botF.setVisible(false);
+		radioButton2botM.setVisible(false);
+		radioButton2botD.setVisible(false);
+	}
+	
 	/**
 	 * Construtor da classe MainMenu. Atribui tamanho e outras propriedades à janela e delega a criação de botões a outros métodos.
 	 */
@@ -56,9 +84,25 @@ public class MainMenu extends JFrame
 		initStartExitBtns();
 		initGameModes();
 		initDifficultyLevels();
-
+		
 		background.setBounds(0, 0, 387, 320);
 		getContentPane().add(background);
+		
+		
+		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
+		
+		rdbtnMinimaxVsMinimax.addChangeListener(new ChangeListener(){
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				// TODO Auto-generated method stub
+				if(rdbtnMinimaxVsMinimax.isSelected())
+				{
+					show2bot();
+				}else{
+					hide2bot();
+				}
+			}});
 
 		this.setVisible(true);
 		this.repaint();		
@@ -89,7 +133,20 @@ public class MainMenu extends JFrame
 				else
 					selected_difficulty=3;
 				
-				Game.init(selected_type, selected_difficulty);
+				int selected_difficulty2=3;
+				
+				if(radioButton2botF.isSelected())
+					selected_difficulty2=1;
+				else if(radioButton2botM.isSelected())
+					selected_difficulty2=2;
+				else
+					selected_difficulty2=3;
+				
+				
+				if(selected_type==2)
+					Game.init(selected_type, selected_difficulty, selected_difficulty2);
+				else
+					Game.init(selected_type, selected_difficulty);
 
 				(new Thread(){
 					@Override
@@ -102,7 +159,7 @@ public class MainMenu extends JFrame
 				self.setVisible(false);
 			}
 		});
-		startButton.setBounds(30, 40, 140, 70);
+		startButton.setBounds(46, 16, 140, 53);
 		getContentPane().add(startButton);
 
 		JButton btnExit = new JButton("Sair");
@@ -122,16 +179,24 @@ public class MainMenu extends JFrame
 	private void initGameModes() 
 	{
 		JLabel lblNewLabel = new JLabel("Modo de jogo: ");
-		lblNewLabel.setBounds(214, 44, 100, 14);
+		lblNewLabel.setBounds(39, 86, 100, 14);
 		getContentPane().add(lblNewLabel);
+		rdbtnHumanVsHuman.setOpaque(false);
 		
-		rdbtnHumanVsHuman.setBounds(192, 64, radioButtonWidth, radioButtonHeight);
+		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
+		rdbtnHumanVsHuman.setBounds(17, 106, 140, 23);
+		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
+		
 		getContentPane().add(rdbtnHumanVsHuman);
-		rdbtnHumanVsMinimax.setBounds(192, 90, radioButtonWidth, radioButtonHeight);
+		rdbtnHumanVsMinimax.setBounds(17, 132, 140, 23);
+		rdbtnHumanVsMinimax.setOpaque(false);
 		getContentPane().add(rdbtnHumanVsMinimax);
-		rdbtnMinimaxVsMinimax.setBounds(192, 116, radioButtonWidth, radioButtonHeight);
+		rdbtnMinimaxVsMinimax.setBounds(17, 158, 140, 23);
+		rdbtnMinimaxVsMinimax.setOpaque(false);
 		getContentPane().add(rdbtnMinimaxVsMinimax);
 		//rdbtnMinimaxVsMinimax.setEnabled(false); //TODO
+
+		
 		
 		gameType.add(rdbtnHumanVsHuman);
 		gameType.add(rdbtnHumanVsMinimax);
@@ -145,19 +210,51 @@ public class MainMenu extends JFrame
 	private void initDifficultyLevels()
 	{
 		JLabel lblDificultyLevel = new JLabel("Dificuldade: ");
-		lblDificultyLevel.setBounds(214, 165, 128, 14);
+		lblDificultyLevel.setBounds(204, 86, 128, 14);
 		getContentPane().add(lblDificultyLevel);
 		
-		rdbtnEasy.setBounds(192, 185, radioButtonWidth, radioButtonHeight);
+		rdbtnEasy.setBounds(170, 106, 57, 23);
+		rdbtnEasy.setOpaque(false);
 		getContentPane().add(rdbtnEasy);
-		rdbtnMedium.setBounds(192, 211, radioButtonWidth, radioButtonHeight);
+		
+		rdbtnMedium.setBounds(229, 106, 63, 23);
+		rdbtnMedium.setOpaque(false);
 		getContentPane().add(rdbtnMedium);
-		rdbtnHard.setBounds(192, 237, radioButtonWidth, radioButtonHeight);
+		rdbtnHard.setBounds(294, 106, 57, 23);
+		rdbtnHard.setOpaque(false);
 		getContentPane().add(rdbtnHard);
+		
+		label2bot = new JLabel("Dificuldade do 2º bot: ");
+		label2bot.setBounds(204, 138, 128, 14);
+		
+		getContentPane().add(label2bot);
+		
+		radioButton2botF = new JRadioButton("F\u00E1cil");
+		radioButton2botF.setBounds(170, 158, 57, 23);
+		radioButton2botF.setOpaque(false);
+		getContentPane().add(radioButton2botF);
+		
+		radioButton2botM = new JRadioButton("M\u00E9dio");
+		radioButton2botM.setBounds(229, 158, 63, 23);
+		radioButton2botM.setOpaque(false);
+		getContentPane().add(radioButton2botM);
+		
+		radioButton2botD = new JRadioButton("Dif\u00EDcil");
+		radioButton2botD.setBounds(294, 158, 57, 23);
+		radioButton2botD.setOpaque(false);
+		getContentPane().add(radioButton2botD);
+		
+		gameDifficulty2bot.add(radioButton2botF);
+		gameDifficulty2bot.add(radioButton2botM);
+		gameDifficulty2bot.add(radioButton2botD);
+		gameDifficulty2bot.setSelected(radioButton2botM.getModel(), true);
+		
 		
 		gameDifficulty.add(rdbtnEasy);
 		gameDifficulty.add(rdbtnMedium);
 		gameDifficulty.add(rdbtnHard);
 		gameDifficulty.setSelected(rdbtnMedium.getModel(), true);
+		
+		hide2bot();
 	}
 }
