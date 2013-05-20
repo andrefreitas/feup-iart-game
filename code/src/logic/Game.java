@@ -2,6 +2,12 @@ package logic;
 
 import graphical.GameWindow;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Random;
 import java.util.Vector;
 
@@ -12,12 +18,19 @@ import algorithms.MiniMax;
  */
 public class Game 
 {
+	public static FileOutputStream st;
 	public static Board board;
 	public static int gameType=0; //0-human vs human; 1-human vs minimax; 2-minimax vs minimax (TODO)
 	public static char botColor='B'; //B - black, W - white, aplicável quando o tipo de jogo é humano contra minimax
 	
 	public static void init(int selected_type, int selected_difficulty) 
 	{
+		try {
+			st=new FileOutputStream((new File("dados.txt")));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Game.board=new Board();
 		Game.gameType=selected_type;
 		Game.board.difficulty=selected_difficulty;		
@@ -27,6 +40,12 @@ public class Game
 	
 	public static void init(int selected_type, int selected_difficulty, int selected_difficulty2)
 	{
+		try {
+			st=new FileOutputStream(new File("dados.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Game.board=new Board();
 		Game.gameType=selected_type;
 		Game.board.difficulty=selected_difficulty;	
@@ -39,7 +58,9 @@ public class Game
 	 * @param moves Vector de jogadas possíveis.
 	 */
 	public static void playBot(Vector<Move> moves) 
-	{		
+	{
+		long before=System.currentTimeMillis();	
+		
 		Move nextMove=null;
 		int moveVal=-10000;
 		
@@ -66,11 +87,30 @@ public class Game
 			}			
 		}
 		
+		long after=System.currentTimeMillis();
+		
+		if(board.turn=='B')
+		{
+			
+			
+			try {
+				
+				
+				
+				byte[] data = ((""+(after-before)+"\n").getBytes());
+				st.write(data);
+				
+				
+			} catch (IOException e) {
+				
+			}
+		}
 		//nextMove.showMove();
 		//System.out.println("Valor jogada: "+moveVal);
 		board.makeMove(nextMove);
 		((GameWindow) GameWindow.self).botPlay(nextMove);
 		//board.getMatrix();
 		//System.out.println("Turn: "+board.turn);
+		
 	}
 }
