@@ -73,7 +73,7 @@ public class Tests
 			
 			if(Game.board.turn=='W')
 			{
-				//Game.board.getMatrix();
+				
 				int i=0;
 				for(Move m : moves)
 				{

@@ -4,10 +4,6 @@ import graphical.MainMenu;
 
 
 
-
-//import game.Tests;
-//import complexity.Profiling;
-
 /**
  * Classe de iniciação da aplicação NineMansMorris
  */
@@ -19,13 +15,8 @@ public class NineMansMorris
 	 */
 	public static void main(String[] args) 
 	{			
-		long before=System.currentTimeMillis();		
 		
 		new MainMenu();
-		//Tests.test1(500);
-		//Tests.test2();
-		
-		long after=System.currentTimeMillis();
-		//System.out.println("Tempo em milis para criação do menu: "+(after-before));
+	
 	}
 }

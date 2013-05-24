@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 
-//import complexity.Profiling;
+
 
 /**
  * Classe auxiliar para guardar um vetor de strings que representa os identificadores das slots adjacentes a uma dada slot.
@@ -31,7 +31,7 @@ class SlotMills
  */
 public class Board 
 {
-	//TODO: Acabar (enorme) refactoring e documentação dos métodos
+	
 	
 	HashMap<String,Piece> slotMap= new HashMap<String,Piece>(); //Mapa de slots do tabuleiro e a peça que cada uma contém (ou null)
 	HashMap<String,AdjacentSlots> adjacentsMap= new HashMap<String,AdjacentSlots>(); //Peças adjacentes a cada slot
@@ -123,11 +123,7 @@ public class Board
 
 	public void makeMove(Move m)
 	{
-		/*if(NineMansMorris.i>=27)
-		{
-			System.out.println("MakeMove start");
-			getMatrix();
-		}*/
+		
 		Boolean blackTurn=false;
 		Vector<Piece> pieces=null;
 		Vector<Piece> piecesRemove=null;
@@ -220,7 +216,7 @@ public class Board
 					System.exit(1);
 				}
 				slotMap.put(m.removedPiece.keyPos,null);
-				//pieces.remove(m.removedPiece);
+				
 				int idx=0;
 				for(Piece pR : piecesRemove)
 				{
@@ -288,12 +284,7 @@ public class Board
 			whiteStage=2;
 
 		lastMove=m;
-		/*if(NineMansMorris.i>=27)
-		{
-			System.out.println("MakeMove");
-			m.showMove();
-			getMatrix();
-		}*/
+		
 	}
 
 	public Vector<Move> getPossibleMoves(char turn)
@@ -309,7 +300,7 @@ public class Board
 		else
 			stage=whiteStage;
 		
-		//Profiling prof=new Profiling(stage,black+white);
+		
 		if(stage==0)
 		{
 			for(String strBoard : slotMap.keySet())
@@ -350,7 +341,7 @@ public class Board
 							Piece pRemove=slotMap.get(strRemove).clone();
 							Move m=new Move(stage,turn,0,0,x,y,pRemove);
 							ret.add(m);
-							//	prof.inc();
+							
 						}
 
 					}
@@ -360,7 +351,7 @@ public class Board
 						ret.add(m);
 					}
 				}
-				//prof.inc();
+				
 			}
 		}
 		else if(stage==1)
@@ -389,7 +380,7 @@ public class Board
 								Piece pRemove=slotMap.get(strRemove).clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
-								//prof.inc();
+								
 							}
 
 						}
@@ -400,9 +391,9 @@ public class Board
 						}
 
 					}
-					//prof.inc();
+					
 				}
-				//prof.inc();
+				
 			}
 		}
 		else if(stage==2)
@@ -432,7 +423,7 @@ public class Board
 								Piece pRemove=slotMap.get(strRemove).clone();
 								Move m=new Move(stage,turn,p.getX(),p.getY(),x,y,pRemove);
 								ret.add(m);
-								//prof.inc();
+								
 							}
 						}
 						else
@@ -442,45 +433,13 @@ public class Board
 						}
 
 					}
-					//prof.inc();
+					
 				}
-				//prof.inc();
+				
 			}
-			//System.out.println("Stage 2, jogadas possiveis: "+ret.size());
+			
 		}
-		//prof.finishProfiling();
-
-		/*for(Move tMove: ret)
-		{
-			if(tMove.removedPiece!=null && (board.get(tMove.removedPiece.keyPos).piece==null || 
-					board.get(tMove.removedPiece.keyPos).piece!=null && 
-					board.get(tMove.removedPiece.keyPos).piece.getValue()!=tMove.removedPiece.getValue()))
-			{
-				System.out.println("ERRO remover peça inexistente turn: "+this.turn);
-				System.out.println("move: "+tMove.stage+" "+tMove.value+" "+tMove.initPos[0]+"-"+tMove.initPos[1]+
-						" "+tMove.finalPos[0]+"-"+tMove.finalPos[1]+" remove: "+tMove.removedPiece.keyPos+" "+tMove.removedPiece.getValue());
-				System.out.println("blackPieces");
-				for(Piece pTeste: blackPieces)
-				{
-					System.out.println("key: "+pTeste.keyPos);
-					System.out.println("x: "+pTeste.x);
-					System.out.println("y: "+pTeste.y);
-					System.out.println("value: "+pTeste.getValue());
-					System.out.println("\n");
-				}
-				System.out.println("whitePieces");
-				for(Piece pTeste: whitePieces)
-				{
-					System.out.println("key: "+pTeste.keyPos);
-					System.out.println("x: "+pTeste.x);
-					System.out.println("y: "+pTeste.y);
-					System.out.println("value: "+pTeste.getValue());
-					System.out.println("\n");
-				}
-
-			}
-		}*/
-
+		
 		return ret;
 	}
 
@@ -567,34 +526,6 @@ public class Board
 	}
 
 
-	/*
-	public Boolean putPiece(Piece p){
-		String key=p.getX()+"-"+p.getY();
-		if (board.containsKey(key) && board.get(key).piece==null){
-			board.get(key).piece=p;
-			return true;
-		}
-		return false;
-	}
-
-	public Piece removePiece(int x,int y){
-		String key=x+"-"+y;
-		if(board.containsKey(key) && board.get(key).piece!=null){
-			Piece p=board.get(key).piece;
-			board.put(key, null);
-			return p;
-		}
-
-		return null;
-	}
-
-
-
-	public boolean putIsValid(int x, int y){
-		String key=x+"-"+y;
-		return board.containsKey(key) && board.get(key)==null;
-	}
-	 */
 	public int evaluate(char value) 
 	{
 		int ret=0;
@@ -808,9 +739,6 @@ public class Board
 
 	public void unmakeMove(Move move) 
 	{
-		/*if(NineMansMorris.i>=27)
-			System.out.println("UnmakeMove start");
-		 */
 		if(move.stage==0)
 		{
 			if(move.removedPiece!=null)
@@ -835,7 +763,7 @@ public class Board
 			Piece p=slotMap.get(finalX+"-"+finalY);
 			if(p.getValue()=='B')
 			{
-				//blackPieces.remove(p);
+				
 				int i=0;
 				for(;i<blackPieces.size();i++)
 				{
@@ -850,7 +778,7 @@ public class Board
 			}
 			else
 			{
-				//whitePieces.remove(p);
+				
 				int i=0;
 				for(;i<whitePieces.size();i++)
 				{
@@ -925,12 +853,7 @@ public class Board
 			whiteStage=1;
 		else 
 			whiteStage=0;
-		/*if(NineMansMorris.i>=27)
-		{
-			System.out.println("UnmakeMove");
-			move.showMove();
-			getMatrix();
-		}*/
+		
 	}
 	
 	public HashMap<String,Piece> getSlotMap()

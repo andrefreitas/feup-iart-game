@@ -2,12 +2,10 @@ package logic;
 
 import graphical.GameWindow;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Random;
 import java.util.Vector;
 
@@ -19,8 +17,8 @@ import algorithms.MiniMax;
 public class Game 
 {
 	public static FileOutputStream st;
-	public static Board board;
-	public static int gameType=0; //0-human vs human; 1-human vs minimax; 2-minimax vs minimax (TODO)
+	public static Board board=null;
+	public static int gameType=0; //0-human vs human; 1-human vs minimax; 2-minimax vs minimax 
 	public static char botColor='B'; //B - black, W - white, aplicável quando o tipo de jogo é humano contra minimax
 	
 	public static void init(int selected_type, int selected_difficulty) 
@@ -28,14 +26,16 @@ public class Game
 		try {
 			st=new FileOutputStream((new File("dados.txt")));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+		}
+		if(Game.board!=null)
+		{
+			
 		}
 		Game.board=new Board();
 		Game.gameType=selected_type;
 		Game.board.difficulty=selected_difficulty;		
-		//System.out.println("Game type "+Game.gameType);
-		//System.out.println("Game difficulty: "+Game.board.difficulty);	
+		
 	}
 	
 	public static void init(int selected_type, int selected_difficulty, int selected_difficulty2)
@@ -43,14 +43,13 @@ public class Game
 		try {
 			st=new FileOutputStream(new File("dados.txt"));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
 		Game.board=new Board();
 		Game.gameType=selected_type;
 		Game.board.difficulty=selected_difficulty;	
 		Game.board.difficulty2=selected_difficulty2;
-		//System.out.println(""+Game.board.difficulty+" - "+Game.board.difficulty2);
+		
 	}
 	
 	/**
@@ -66,8 +65,7 @@ public class Game
 		
 		for(Move m : moves)
 		{			
-			int minimaxVal=MiniMax.play(m, 0,false, /*moveVal*/ -10000, 10000, board.turn); //TODO: Na verdade isto trata-se de um nó max (porque é a raiz), por isso ao invocar play alfa deveria ser igual a moveVal e não -10000 sempre, por favor verifica
-			//System.out.println("minimax: "+minimaxVal);
+			int minimaxVal=MiniMax.play(m, 0,false, -10000, 10000, board.turn); 
 			if(minimaxVal==moveVal)
 			{
 				Random rd= new Random();
@@ -75,7 +73,7 @@ public class Game
 				
 				if(rd.nextDouble()<=nrd)
 				{
-					//System.out.println("rand: <="+nrd);
+					
 					moveVal=minimaxVal;
 					nextMove=m;
 				}
@@ -105,12 +103,10 @@ public class Game
 				
 			}
 		}
-		//nextMove.showMove();
-		//System.out.println("Valor jogada: "+moveVal);
+		
 		board.makeMove(nextMove);
 		((GameWindow) GameWindow.self).botPlay(nextMove);
-		//board.getMatrix();
-		//System.out.println("Turn: "+board.turn);
+	
 		
 	}
 }

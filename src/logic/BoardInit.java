@@ -5,7 +5,7 @@ package logic;
  */
 public class BoardInit 
 {
-	//TODO: compactar código de iniciação das adjacências
+
 	
 	/**
 	 * Método que invoca as funções adequadas para inicializar um tabuleiro recebido como argumento.

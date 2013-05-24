@@ -27,12 +27,7 @@ public class MiniMax
 			v='W';
 		else 
 			v='B';
-		//System.out.println("Minimax: "+nMoves);
-		//System.out.println("Turn: "+move.value);
-		/*if(move.removedPiece!=null && move.removedPiece.x==2 && move.removedPiece.y==4 && move.removedPiece.getValue()=='W' && Game.board.white>4)
-		{
-			System.out.println("Erro nabiço....."+move.stage+" "+move.value+" ");
-		}*/
+		
 		Game.board.makeMove(move);		
 		Vector<Move> childmoves=Game.board.getPossibleMoves(v);
 		
@@ -45,15 +40,10 @@ public class MiniMax
 		}
 		else if(max)
 		{
-			//Vector<Move> childmoves=Game.board.getPossibleMoves(v);
+			
 			for(Move movei:childmoves)
 			{
-				//System.out.println("MAX: ");
-				/*if(Game.i>=27)
-				{
-					System.out.println("Minimax move: ");
-					movei.showMove();
-				}*/
+			
 				alpha=Math.max(alpha,play(movei,nMoves,!max,alpha,beta,turn));
 				if(beta<alpha) break;
 			}
@@ -64,15 +54,10 @@ public class MiniMax
 		}
 		else if(!max)
 		{			
-			//Vector<Move> childmoves=Game.board.getPossibleMoves(v);
+			
 			for(Move movei:childmoves)
 			{
-				//System.out.println("MIN: ");
-				/*if(Game.i>=27)
-				{
-					System.out.println("Minimax move: ");
-					movei.showMove();
-				}*/
+				
 				beta=Math.min(beta,play(movei,nMoves,!max,alpha,beta,turn));
 				if(beta<alpha) break;
 			}

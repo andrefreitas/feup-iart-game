@@ -6,7 +6,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 
-import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -89,13 +88,13 @@ public class MainMenu extends JFrame
 		getContentPane().add(background);
 		
 		
-		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
+	
 		
 		rdbtnMinimaxVsMinimax.addChangeListener(new ChangeListener(){
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				// TODO Auto-generated method stub
+				
 				if(rdbtnMinimaxVsMinimax.isSelected())
 				{
 					show2bot();
@@ -183,9 +182,8 @@ public class MainMenu extends JFrame
 		getContentPane().add(lblNewLabel);
 		rdbtnHumanVsHuman.setOpaque(false);
 		
-		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
 		rdbtnHumanVsHuman.setBounds(17, 106, 140, 23);
-		//rdbtnHumanVsHuman.setBackground(new Color(1,1,1,1));
+		
 		
 		getContentPane().add(rdbtnHumanVsHuman);
 		rdbtnHumanVsMinimax.setBounds(17, 132, 140, 23);
@@ -194,10 +192,8 @@ public class MainMenu extends JFrame
 		rdbtnMinimaxVsMinimax.setBounds(17, 158, 140, 23);
 		rdbtnMinimaxVsMinimax.setOpaque(false);
 		getContentPane().add(rdbtnMinimaxVsMinimax);
-		//rdbtnMinimaxVsMinimax.setEnabled(false); //TODO
+	
 
-		
-		
 		gameType.add(rdbtnHumanVsHuman);
 		gameType.add(rdbtnHumanVsMinimax);
 		gameType.add(rdbtnMinimaxVsMinimax);	
